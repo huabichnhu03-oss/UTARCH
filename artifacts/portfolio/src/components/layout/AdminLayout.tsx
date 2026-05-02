@@ -7,7 +7,12 @@ import { useToast } from "@/hooks/use-toast";
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
-  const { data: auth, isLoading } = useAdminMe();
+  const { data: auth, isLoading } = useAdminMe({
+    query: {
+      refetchOnMount: "always",
+      staleTime: 0,
+    }
+  });
   const logout = useAdminLogout();
   const { toast } = useToast();
 

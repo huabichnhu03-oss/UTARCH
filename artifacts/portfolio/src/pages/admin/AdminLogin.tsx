@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useAdminLogin } from "@workspace/api-client-react";
+import { useAdminLogin, getAdminMeQueryKey } from "@workspace/api-client-react";
 import { useLocation } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -10,6 +11,7 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const login = useAdminLogin();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -17,8 +19,9 @@ export default function AdminLogin() {
     login.mutate(
       { data: { password } },
       {
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
           if (data.authenticated) {
+            await queryClient.resetQueries({ queryKey: getAdminMeQueryKey() });
             setLocation("/admin");
             toast({ title: "Logged in successfully" });
           } else {
