@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uyen Ton | Architectural Technologist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Architectural Blueprint Palette */
+            --c-blue: #0033A0;        /* Deep structural blue */
+            --c-white: #FFFFFF;       /* Clean white */
+            --c-accent: #FF4A22;      /* Vibrant terracotta/orange for interaction */
+            --c-text: #0A192F;        /* Very dark blue, almost black */
+            --c-muted: #64748B;
+            --border-width: 1px;
+            --border: var(--border-width) solid var(--c-blue);
+            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--c-white);
+            color: var(--c-text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-weight: 500;
+            letter-spacing: -0.02em;
+        }
+
+        .mono {
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* Main Container - Strict Borders */
+        .wrapper {
+            max-width: 1440px;
+            margin: 20px auto;
+            border-left: var(--border);
+            border-right: var(--border);
+            border-top: var(--border);
+            background: var(--c-white);
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: var(--border);
+            background-color: var(--c-white);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            padding: 20px 40px;
+            color: var(--c-blue);
+            border-right: var(--border);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .nav-links {
+            display: flex;
+            height: 100%;
+        }
+
+        .nav-links a {
+            padding: 20px 40px;
+            font-weight: 500;
+            border-left: var(--border);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            background-color: var(--c-blue);
+            color: var(--c-white);
+        }
+
+        /* Strict Blueprint Grid Elements */
+        .row {
+            display: flex;
+            border-bottom: var(--border);
+            flex-wrap: wrap;
+        }
+
+        .col {
+            flex: 1;
+            border-right: var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .col:last-child {
+            border-right: none;
+        }
+
+        .pad-lg { padding: 60px 40px; }
+        .pad-md { padding: 40px; }
+        .pad-sm { padding: 20px 40px; }
+
+        /* Hero Section */
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 8rem);
+            font-weight: 700;
+            line-height: 0.9;
+            color: var(--c-blue);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            letter-spacing: -0.04em;
+        }
+
+        .hero-image-wrapper {
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            border-bottom: var(--border);
+        }
+
+        .hero-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(20%) contrast(1.1);
+        }
+
+        /* Ticker / Info Bar */
+        .info-bar {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--c-blue);
+            color: var(--c-white);
+        }
+
+        /* Skills Grid */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0;
+        }
+
+        .skill-item {
+            padding: 15px 20px;
+            border-bottom: var(--border);
+            border-right: var(--border);
+            font-size: 0.9rem;
+            color: var(--c-blue);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .skill-item:nth-child(even) { border-right: none; }
+        .skill-item:nth-last-child(-n+2) { border-bottom: none; }
+
+        .skill-item:hover {
+            background-color: var(--c-accent);
+            color: var(--c-white);
+        }
+
+        /* Projects Section */
+        .section-header {
+            background-color: var(--c-blue);
+            color: var(--c-white);
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .project-card {
+            border-right: var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .project-card:last-child {
+            border-right: none;
+        }
+
+        .project-img {
+            height: 300px;
+            border-bottom: var(--border);
+            overflow: hidden;
+        }
+
+        .project-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .project-card:hover .project-img img {
+            transform: scale(1.05);
+        }
+
+        .project-card:hover {
+            background-color: var(--c-blue);
+            color: var(--c-white);
+        }
+
+        .project-card:hover .project-info h3, 
+        .project-card:hover .project-info p {
+            color: var(--c-white);
+        }
+
+        .project-info {
+            padding: 30px 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .project-info h3 {
+            font-size: 1.2rem;
+            color: var(--c-blue);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .project-info p {
+            color: var(--c-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Project Details Page */
+        #project-view {
+            display: none;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 20px 40px;
+            color: var(--c-blue);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: var(--border);
+            border-right: var(--border);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .back-btn:hover {
+            background-color: var(--c-accent);
+            color: var(--c-white);
+        }
+
+        .detail-meta {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-bottom: var(--border);
+        }
+
+        .meta-item {
+            padding: 20px 40px;
+            border-right: var(--border);
+        }
+        .meta-item:last-child { border-right: none; }
+
+        .meta-label {
+            color: var(--c-muted);
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: var(--c-blue);
+            font-size: 1.1rem;
+        }
+
+        .structure-list {
+            list-style: none;
+            counter-reset: my-awesome-counter;
+        }
+
+        .structure-item {
+            display: flex;
+            border-bottom: var(--border);
+            counter-increment: my-awesome-counter;
+        }
+        .structure-item:last-child { border-bottom: none; }
+
+        .structure-number {
+            width: 100px;
+            border-right: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--c-blue);
+            background: rgba(0, 51, 160, 0.03);
+        }
+
+        .structure-content {
+            padding: 40px;
+            flex: 1;
+        }
+
+        .structure-content h3 {
+            color: var(--c-blue);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        /* Footer */
+        footer {
+            border-top: var(--border);
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .footer-col {
+            flex: 1;
+            padding: 40px;
+            border-right: var(--border);
+        }
+        .footer-col:last-child { border-right: none; }
+
+        .footer-col a {
+            display: block;
+            margin-top: 10px;
+            color: var(--c-blue);
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        .footer-col a:hover { color: var(--c-accent); }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .projects-grid { grid-template-columns: repeat(2, 1fr); }
+            .project-card:nth-child(2) { border-right: none; }
+            .project-card:nth-child(1), .project-card:nth-child(2) { border-bottom: var(--border); }
+            .detail-meta { grid-template-columns: 1fr; }
+            .meta-item { border-right: none; border-bottom: var(--border); }
+            .meta-item:last-child { border-bottom: none; }
+        }
+
+        @media (max-width: 768px) {
+            nav { flex-direction: column; align-items: stretch; }
+            .logo { border-right: none; border-bottom: var(--border); text-align: center; }
+            .nav-links a { border-left: none; border-right: var(--border); flex: 1; text-align: center; }
+            .nav-links a:last-child { border-right: none; }
+            .row { flex-direction: column; }
+            .col { border-right: none; border-bottom: var(--border); }
+            .col:last-child { border-bottom: none; }
+            .info-bar { flex-direction: column; }
+            .info-bar .pad-sm { border-bottom: 1px solid rgba(255,255,255,0.2); text-align: center; }
+            .footer-col { flex: 100%; border-right: none; border-bottom: var(--border); }
+            .projects-grid { grid-template-columns: 1fr; }
+            .project-card { border-right: none; border-bottom: var(--border); }
+            .project-card:last-child { border-bottom: none; }
+            .structure-item { flex-direction: column; }
+            .structure-number { width: 100%; height: 60px; border-right: none; border-bottom: var(--border); }
+            .pad-lg { padding: 40px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- NAVIGATION -->
+        <nav>
+            <div class="logo" onclick="showHome()">UYEN TON</div>
+            <div class="nav-links mono">
+                <a onclick="showHome()">Index</a>
+                <a href="#projects" onclick="showHome()">Archive</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </nav>
+
+        <!-- MAIN HOME VIEW -->
+        <main id="home-view">
+            <!-- Hero Title Row -->
+            <div class="row">
+                <div class="col pad-lg">
+                    <h1 class="hero-title">Architectural<br>Technologist</h1>
+                    <p style="font-size: 1.2rem; max-width: 600px; color: var(--c-muted);">
+                        Sheridan College High Honours graduate specializing in technical drawing, 3D modeling, and strict Ontario Building Code compliance.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Hero Image -->
+            <div class="hero-image-wrapper">
+                <!-- Using onerror to inject Unsplash fallback if local file is missing -->
+                <img src="Sample-6.jpg" 
+                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80';" 
+                     alt="Modern Architecture">
+            </div>
+
+            <!-- Info Bar -->
+            <div class="row info-bar mono">
+                <div class="pad-sm">BASED IN TORONTO, ON</div>
+                <div class="pad-sm">AVAILABLE FOR HIRE</div>
+                <div class="pad-sm">OBC & LEED COMPLIANT</div>
+            </div>
+
+            <!-- About & Skills Split -->
+            <div class="row">
+                <div class="col pad-lg" style="flex: 1.5;">
+                    <div class="mono" style="margin-bottom: 20px; color: var(--c-blue);">01 / Methodology</div>
+                    <h2 style="font-size: 2rem; color: var(--c-blue); margin-bottom: 20px; line-height: 1.2;">
+                        Translating complex architectural concepts into highly precise construction documents.
+                    </h2>
+                    <p style="font-size: 1.1rem; color: var(--c-muted);">
+                        My process prioritizes seamless workflows—from initial site measurements to detailed CAD drafting—ensuring full compliance with zoning by-laws and sustainable LEED standards. I bring spaces to life through accurate technical specifications and immersive 3D visualizations.
+                    </p>
+                </div>
+                <div class="col">
+                    <div class="pad-sm mono" style="border-bottom: var(--border); color: var(--c-blue);">02 / Technical Toolkit</div>
+                    <div class="skills-grid mono">
+                        <div class="skill-item">AutoCAD</div>
+                        <div class="skill-item">Revit</div>
+                        <div class="skill-item">SketchUp</div>
+                        <div class="skill-item">Lumion</div>
+                        <div class="skill-item">V-ray</div>
+                        <div class="skill-item">OBC Compliance</div>
+                        <div class="skill-item">Site Planning</div>
+                        <div class="skill-item">Photoshop</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Header -->
+            <div class="row section-header pad-sm mono" id="projects">
+                Selected Archive (2019 — Present)
+            </div>
+
+            <!-- Projects Grid -->
+            <div class="projects-grid">
+                
+                <div class="project-card" onclick="showProject('lloyd')">
+                    <div class="project-img">
+                        <img src="DSCF6876.jpg" 
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1582063289852-62e3ba2747f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';" 
+                             alt="Commercial Schematic Design">
+                    </div>
+                    <div class="project-info">
+                        <div class="mono" style="margin-bottom: 10px;">Lloyd Hunt Architect</div>
+                        <h3>Schematic Design & Permitting</h3>
+                        <p>Planning & CAD Development</p>
+                    </div>
+                </div>
+
+                <div class="project-card" onclick="showProject('iq')">
+                    <div class="project-img">
+                        <img src="Sample-4.jpg" 
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556910103-1c02745a872f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';" 
+                             alt="Millwork Drafting">
+                    </div>
+                    <div class="project-info">
+                        <div class="mono" style="margin-bottom: 10px;">IQ Fine Cabinetry</div>
+                        <h3>Millwork & Cabinetry Drafting</h3>
+                        <p>2D/3D Residential Modeling</p>
+                    </div>
+                </div>
+
+                <div class="project-card" onclick="showProject('dinh')">
+                    <div class="project-img">
+                        <img src="DSCF6886.jpg" 
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';" 
+                             alt="Hospitality Layout">
+                    </div>
+                    <div class="project-info">
+                        <div class="mono" style="margin-bottom: 10px;">Dinh Design</div>
+                        <h3>Commercial & Res. Layouts</h3>
+                        <p>OBC & LEED Standard Compliance</p>
+                    </div>
+                </div>
+
+                <div class="project-card" onclick="showProject('huis')">
+                    <div class="project-img">
+                        <img src="Sample-7.jpg" 
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';" 
+                             alt="Residential Addition">
+                    </div>
+                    <div class="project-info">
+                        <div class="mono" style="margin-bottom: 10px;">HUIS Design</div>
+                        <h3>Sustainable Building Forms</h3>
+                        <p>Site-Responsive Topography Layouts</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- PROJECT DETAILS VIEW -->
+        <main id="project-view">
+            <div class="row">
+                <div class="back-btn mono" onclick="showHome()">← Return to Index</div>
+            </div>
+
+            <!-- Dynamic Header -->
+            <div class="row">
+                <div class="col pad-lg">
+                    <h1 class="hero-title" style="font-size: clamp(2.5rem, 6vw, 5rem);">Architectural Design & Drafting</h1>
+                </div>
+            </div>
+
+            <div class="detail-meta mono">
+                <div class="meta-item">
+                    <div class="meta-label">ROLE</div>
+                    <div class="meta-value">Architectural Designer</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">FOCUS</div>
+                    <div class="meta-value">Compliance & Rendering</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">TOOLS</div>
+                    <div class="meta-value">AutoCAD, SketchUp, Lumion</div>
+                </div>
+            </div>
+
+            <!-- Main Feature Image -->
+            <div class="hero-image-wrapper" style="height: 600px;">
+                <img src="DSCF6889.jpg" 
+                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80';" 
+                     alt="Detailed Interior">
+            </div>
+
+            <div class="row">
+                <div class="col" style="flex: 1; border-right: var(--border);">
+                    <div class="pad-md">
+                        <div class="mono" style="color: var(--c-blue); margin-bottom: 20px;">PROJECT METHODOLOGY</div>
+                        <h2 style="font-size: 2rem; color: var(--c-blue); line-height: 1.2;">The Architecture Experience Structure</h2>
+                        <p style="margin-top: 20px; color: var(--c-muted);">A breakdown of professional methodology for managing projects from conception through to municipal approval, ensuring all aesthetic and regulatory constraints are met.</p>
+                    </div>
+                </div>
+                <div class="col" style="flex: 2;">
+                    <div class="structure-list">
+                        <div class="structure-item">
+                            <div class="structure-number mono">01</div>
+                            <div class="structure-content">
+                                <h3>Site Assessment & Context</h3>
+                                <p>Conducting rigorous site measurements and inspections prior to and post-construction. Developing site-responsive layouts that heavily consider existing topography, solar orientation, and local wind patterns to ensure sustainable design integration.</p>
+                            </div>
+                        </div>
+
+                        <div class="structure-item">
+                            <div class="structure-number mono">02</div>
+                            <div class="structure-content">
+                                <h3>Schematic & Design Development</h3>
+                                <p>Drafting and modifying detailed schematic drawing packages. Utilizing AutoCAD and Revit to edit project settings, drafting objects, components, and sheet layouts to maintain a highly efficient project workflow.</p>
+                            </div>
+                        </div>
+
+                        <div class="structure-item">
+                            <div class="structure-number mono">03</div>
+                            <div class="structure-content">
+                                <h3>OBC & Zoning Compliance</h3>
+                                <p>Interpreting and strictly applying the Ontario Building Code (OBC) and local zoning by-laws. Producing detailed compliance reports that successfully streamline municipal planning approvals, Minor Variances, and Site Plan Approvals.</p>
+                            </div>
+                        </div>
+
+                        <div class="structure-item">
+                            <div class="structure-number mono">04</div>
+                            <div class="structure-content">
+                                <h3>Technical Detailing & Millwork</h3>
+                                <p>Designing precise 2D drawings and 3D models for interior elements, specifically cabinetry and complex millwork for residential and commercial spaces. Assisting with material selection and technical specifications.</p>
+                            </div>
+                        </div>
+
+                        <div class="structure-item">
+                            <div class="structure-number mono">05</div>
+                            <div class="structure-content">
+                                <h3>3D Visualization & Delivery</h3>
+                                <p>Creating highly detailed 3D renderings and visualizations using SketchUp, Lumion, and V-ray. These models are crucial for enhancing client engagement, verifying construction accuracy, and ensuring the built environment perfectly matches the design intent.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Images Gallery -->
+            <div class="row">
+                <div class="col" style="height: 400px; overflow: hidden;">
+                    <img src="Sample-3.jpg" 
+                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';" 
+                         alt="Interior View" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="col" style="height: 400px; overflow: hidden;">
+                    <img src="Sample-7.jpg" 
+                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';" 
+                         alt="Exterior View" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+            </div>
+        </main>
+
+        <!-- FOOTER -->
+        <footer id="contact">
+            <div class="footer-col">
+                <div class="mono" style="color: var(--c-muted); margin-bottom: 10px;">LOCATION</div>
+                <div style="font-size: 1.2rem; font-weight: 600; color: var(--c-blue);">Toronto, Ontario</div>
+            </div>
+            <div class="footer-col">
+                <div class="mono" style="color: var(--c-muted); margin-bottom: 10px;">INQUIRIES</div>
+                <a href="mailto:uyenton285@gmail.com">uyenton285@gmail.com</a>
+            </div>
+            <div class="footer-col">
+                <div class="mono" style="color: var(--c-muted); margin-bottom: 10px;">PHONE</div>
+                <a href="tel:6477134229">647-713-4229</a>
+            </div>
+            <div class="footer-col">
+                <div class="mono" style="color: var(--c-muted); margin-bottom: 10px;">NETWORK</div>
+                <a href="https://www.linkedin.com/in/uyentonarch/" target="_blank">LinkedIn Profile ↗</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript to toggle views -->
+    <script>
+        const homeView = document.getElementById('home-view');
+        const projectView = document.getElementById('project-view');
+
+        function showProject(projectId) {
+            homeView.style.display = 'none';
+            projectView.style.display = 'block';
+            window.scrollTo(0, 0); 
+        }
+
+        function showHome() {
+            projectView.style.display = 'none';
+            homeView.style.display = 'block';
+            window.scrollTo(0, 0); 
+        }
+    </script>
+</body>
+</html>

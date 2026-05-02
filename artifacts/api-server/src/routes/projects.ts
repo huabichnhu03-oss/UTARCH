@@ -1,0 +1,134 @@
+import { Router, type IRouter, type Request, type Response } from "express";
+import { eq, asc } from "drizzle-orm";
+import { db, projectsTable } from "@workspace/db";
+
+const router: IRouter = Router();
+
+function requireAdmin(req: Request, res: Response, next: () => void) {
+  const isAdmin = (req.session as unknown as Record<string, unknown>)["isAdmin"] === true;
+  if (!isAdmin) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+  next();
+}
+
+function mapProject(p: typeof projectsTable.$inferSelect) {
+  return {
+    id: p.id,
+    title: p.title,
+    client: p.client,
+    subtitle: p.subtitle,
+    role: p.role,
+    focus: p.focus,
+    tools: p.tools,
+    coverImage: p.coverImage ?? null,
+    heroImage: p.heroImage ?? null,
+    description: p.description ?? null,
+    methodologySteps: (p.methodologySteps as { title: string; description: string }[]) ?? [],
+    galleryImages: (p.galleryImages as string[]) ?? [],
+    sortOrder: p.sortOrder,
+    published: p.published,
+    createdAt: p.createdAt.toISOString(),
+  };
+}
+
+router.get("/projects", async (req: Request, res: Response) => {
+  try {
+    const rows = await db
+      .select()
+      .from(projectsTable)
+      .where(eq(projectsTable.published, true))
+      .orderBy(asc(projectsTable.sortOrder));
+    res.json(rows.map(mapProject));
+  } catch (err) {
+    req.log.error({ err }, "Error listing projects");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/projects/all", requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const rows = await db.select().from(projectsTable).orderBy(asc(projectsTable.sortOrder));
+    res.json(rows.map(mapProject));
+  } catch (err) {
+    req.log.error({ err }, "Error listing all projects");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/projects/:id", async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id ?? "");
+  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
+  try {
+    const rows = await db.select().from(projectsTable).where(eq(projectsTable.id, id)).limit(1);
+    if (!rows[0]) { res.status(404).json({ error: "Not found" }); return; }
+    res.json(mapProject(rows[0]));
+  } catch (err) {
+    req.log.error({ err }, "Error getting project");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/projects", requireAdmin, async (req: Request, res: Response) => {
+  const body = req.body as {
+    title: string; client: string; subtitle: string; role: string; focus: string; tools: string;
+    coverImage?: string | null; heroImage?: string | null; description?: string | null;
+    methodologySteps?: { title: string; description: string }[]; galleryImages?: string[];
+    sortOrder?: number; published?: boolean;
+  };
+  try {
+    const inserted = await db.insert(projectsTable).values({
+      title: body.title,
+      client: body.client,
+      subtitle: body.subtitle,
+      role: body.role,
+      focus: body.focus,
+      tools: body.tools,
+      coverImage: body.coverImage ?? null,
+      heroImage: body.heroImage ?? null,
+      description: body.description ?? null,
+      methodologySteps: body.methodologySteps ?? [],
+      galleryImages: body.galleryImages ?? [],
+      sortOrder: body.sortOrder ?? 0,
+      published: body.published ?? true,
+    }).returning();
+    res.status(201).json(mapProject(inserted[0]!));
+  } catch (err) {
+    req.log.error({ err }, "Error creating project");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.put("/projects/:id", requireAdmin, async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id ?? "");
+  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
+  const body = req.body as Partial<{
+    title: string; client: string; subtitle: string; role: string; focus: string; tools: string;
+    coverImage: string | null; heroImage: string | null; description: string | null;
+    methodologySteps: { title: string; description: string }[]; galleryImages: string[];
+    sortOrder: number; published: boolean;
+  }>;
+  try {
+    const updated = await db.update(projectsTable).set(body).where(eq(projectsTable.id, id)).returning();
+    if (!updated[0]) { res.status(404).json({ error: "Not found" }); return; }
+    res.json(mapProject(updated[0]));
+  } catch (err) {
+    req.log.error({ err }, "Error updating project");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.delete("/projects/:id", requireAdmin, async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id ?? "");
+  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
+  try {
+    await db.delete(projectsTable).where(eq(projectsTable.id, id));
+    res.status(204).send();
+  } catch (err) {
+    req.log.error({ err }, "Error deleting project");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+export default router;

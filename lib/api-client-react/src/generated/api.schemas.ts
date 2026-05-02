@@ -8,3 +8,145 @@
 export interface HealthStatus {
   status: string;
 }
+
+export interface AdminLoginBody {
+  password: string;
+}
+
+export interface AdminAuthStatus {
+  authenticated: boolean;
+}
+
+export interface MethodologyStep {
+  title: string;
+  description: string;
+}
+
+export interface Project {
+  id: number;
+  title: string;
+  client: string;
+  subtitle: string;
+  role: string;
+  focus: string;
+  tools: string;
+  coverImage?: string | null;
+  heroImage?: string | null;
+  description?: string | null;
+  methodologySteps: MethodologyStep[];
+  galleryImages: string[];
+  sortOrder: number;
+  published: boolean;
+  createdAt: string;
+}
+
+export interface CreateProjectBody {
+  title: string;
+  client: string;
+  subtitle: string;
+  role: string;
+  focus: string;
+  tools: string;
+  coverImage?: string | null;
+  heroImage?: string | null;
+  description?: string | null;
+  methodologySteps?: MethodologyStep[];
+  galleryImages?: string[];
+  sortOrder?: number;
+  published?: boolean;
+}
+
+export interface UpdateProjectBody {
+  title?: string;
+  client?: string;
+  subtitle?: string;
+  role?: string;
+  focus?: string;
+  tools?: string;
+  coverImage?: string | null;
+  heroImage?: string | null;
+  description?: string | null;
+  methodologySteps?: MethodologyStep[];
+  galleryImages?: string[];
+  sortOrder?: number;
+  published?: boolean;
+}
+
+export interface Post {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt?: string | null;
+  content: string;
+  coverImage?: string | null;
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePostBody {
+  title: string;
+  slug: string;
+  excerpt?: string | null;
+  content: string;
+  coverImage?: string | null;
+  published?: boolean;
+}
+
+export interface UpdatePostBody {
+  title?: string;
+  slug?: string;
+  excerpt?: string | null;
+  content?: string;
+  coverImage?: string | null;
+  published?: boolean;
+}
+
+export interface Skill {
+  id: number;
+  name: string;
+  sortOrder: number;
+}
+
+export interface CreateSkillBody {
+  name: string;
+  sortOrder?: number;
+}
+
+export interface UpdateSkillBody {
+  name?: string;
+  sortOrder?: number;
+}
+
+export interface SiteSettings {
+  id: number;
+  ownerName: string;
+  title: string;
+  subtitle: string;
+  heroImage?: string | null;
+  aboutHeading: string;
+  aboutBody: string;
+  infoItems: string[];
+  location: string;
+  email: string;
+  phone: string;
+  linkedin: string;
+  archiveDateRange: string;
+  adminPasswordHash?: string | null;
+}
+
+export interface UpdateSettingsBody {
+  ownerName?: string;
+  title?: string;
+  subtitle?: string;
+  heroImage?: string | null;
+  aboutHeading?: string;
+  aboutBody?: string;
+  infoItems?: string[];
+  location?: string;
+  email?: string;
+  phone?: string;
+  linkedin?: string;
+  archiveDateRange?: string;
+  adminPassword?: string | null;
+}

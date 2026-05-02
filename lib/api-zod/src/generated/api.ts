@@ -8,9 +8,393 @@
 import * as zod from "zod";
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
+});
+
+/**
+ * @summary Admin login
+ */
+export const AdminLoginBody = zod.object({
+  password: zod.string(),
+});
+
+export const AdminLoginResponse = zod.object({
+  authenticated: zod.boolean(),
+});
+
+/**
+ * @summary Check admin auth status
+ */
+export const AdminMeResponse = zod.object({
+  authenticated: zod.boolean(),
+});
+
+/**
+ * @summary List published projects
+ */
+export const ListProjectsResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  client: zod.string(),
+  subtitle: zod.string(),
+  role: zod.string(),
+  focus: zod.string(),
+  tools: zod.string(),
+  coverImage: zod.string().nullish(),
+  heroImage: zod.string().nullish(),
+  description: zod.string().nullish(),
+  methodologySteps: zod.array(
+    zod.object({
+      title: zod.string(),
+      description: zod.string(),
+    }),
+  ),
+  galleryImages: zod.array(zod.string()),
+  sortOrder: zod.number(),
+  published: zod.boolean(),
+  createdAt: zod.string(),
+});
+export const ListProjectsResponse = zod.array(ListProjectsResponseItem);
+
+/**
+ * @summary Create a project (admin)
+ */
+export const CreateProjectBody = zod.object({
+  title: zod.string(),
+  client: zod.string(),
+  subtitle: zod.string(),
+  role: zod.string(),
+  focus: zod.string(),
+  tools: zod.string(),
+  coverImage: zod.string().nullish(),
+  heroImage: zod.string().nullish(),
+  description: zod.string().nullish(),
+  methodologySteps: zod
+    .array(
+      zod.object({
+        title: zod.string(),
+        description: zod.string(),
+      }),
+    )
+    .optional(),
+  galleryImages: zod.array(zod.string()).optional(),
+  sortOrder: zod.number().optional(),
+  published: zod.boolean().optional(),
+});
+
+/**
+ * @summary List all projects including drafts (admin)
+ */
+export const ListAllProjectsResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  client: zod.string(),
+  subtitle: zod.string(),
+  role: zod.string(),
+  focus: zod.string(),
+  tools: zod.string(),
+  coverImage: zod.string().nullish(),
+  heroImage: zod.string().nullish(),
+  description: zod.string().nullish(),
+  methodologySteps: zod.array(
+    zod.object({
+      title: zod.string(),
+      description: zod.string(),
+    }),
+  ),
+  galleryImages: zod.array(zod.string()),
+  sortOrder: zod.number(),
+  published: zod.boolean(),
+  createdAt: zod.string(),
+});
+export const ListAllProjectsResponse = zod.array(ListAllProjectsResponseItem);
+
+/**
+ * @summary Get a single project
+ */
+export const GetProjectParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetProjectResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  client: zod.string(),
+  subtitle: zod.string(),
+  role: zod.string(),
+  focus: zod.string(),
+  tools: zod.string(),
+  coverImage: zod.string().nullish(),
+  heroImage: zod.string().nullish(),
+  description: zod.string().nullish(),
+  methodologySteps: zod.array(
+    zod.object({
+      title: zod.string(),
+      description: zod.string(),
+    }),
+  ),
+  galleryImages: zod.array(zod.string()),
+  sortOrder: zod.number(),
+  published: zod.boolean(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary Update a project (admin)
+ */
+export const UpdateProjectParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateProjectBody = zod.object({
+  title: zod.string().optional(),
+  client: zod.string().optional(),
+  subtitle: zod.string().optional(),
+  role: zod.string().optional(),
+  focus: zod.string().optional(),
+  tools: zod.string().optional(),
+  coverImage: zod.string().nullish(),
+  heroImage: zod.string().nullish(),
+  description: zod.string().nullish(),
+  methodologySteps: zod
+    .array(
+      zod.object({
+        title: zod.string(),
+        description: zod.string(),
+      }),
+    )
+    .optional(),
+  galleryImages: zod.array(zod.string()).optional(),
+  sortOrder: zod.number().optional(),
+  published: zod.boolean().optional(),
+});
+
+export const UpdateProjectResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  client: zod.string(),
+  subtitle: zod.string(),
+  role: zod.string(),
+  focus: zod.string(),
+  tools: zod.string(),
+  coverImage: zod.string().nullish(),
+  heroImage: zod.string().nullish(),
+  description: zod.string().nullish(),
+  methodologySteps: zod.array(
+    zod.object({
+      title: zod.string(),
+      description: zod.string(),
+    }),
+  ),
+  galleryImages: zod.array(zod.string()),
+  sortOrder: zod.number(),
+  published: zod.boolean(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary Delete a project (admin)
+ */
+export const DeleteProjectParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary List published posts
+ */
+export const ListPostsResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  slug: zod.string(),
+  excerpt: zod.string().nullish(),
+  content: zod.string(),
+  coverImage: zod.string().nullish(),
+  published: zod.boolean(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+export const ListPostsResponse = zod.array(ListPostsResponseItem);
+
+/**
+ * @summary Create a post (admin)
+ */
+export const CreatePostBody = zod.object({
+  title: zod.string(),
+  slug: zod.string(),
+  excerpt: zod.string().nullish(),
+  content: zod.string(),
+  coverImage: zod.string().nullish(),
+  published: zod.boolean().optional(),
+});
+
+/**
+ * @summary List all posts including drafts (admin)
+ */
+export const ListAllPostsResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  slug: zod.string(),
+  excerpt: zod.string().nullish(),
+  content: zod.string(),
+  coverImage: zod.string().nullish(),
+  published: zod.boolean(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+export const ListAllPostsResponse = zod.array(ListAllPostsResponseItem);
+
+/**
+ * @summary Get a single post
+ */
+export const GetPostParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetPostResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  slug: zod.string(),
+  excerpt: zod.string().nullish(),
+  content: zod.string(),
+  coverImage: zod.string().nullish(),
+  published: zod.boolean(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+
+/**
+ * @summary Update a post (admin)
+ */
+export const UpdatePostParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdatePostBody = zod.object({
+  title: zod.string().optional(),
+  slug: zod.string().optional(),
+  excerpt: zod.string().nullish(),
+  content: zod.string().optional(),
+  coverImage: zod.string().nullish(),
+  published: zod.boolean().optional(),
+});
+
+export const UpdatePostResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  slug: zod.string(),
+  excerpt: zod.string().nullish(),
+  content: zod.string(),
+  coverImage: zod.string().nullish(),
+  published: zod.boolean(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+
+/**
+ * @summary Delete a post (admin)
+ */
+export const DeletePostParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary List all skills
+ */
+export const ListSkillsResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  sortOrder: zod.number(),
+});
+export const ListSkillsResponse = zod.array(ListSkillsResponseItem);
+
+/**
+ * @summary Create a skill (admin)
+ */
+export const CreateSkillBody = zod.object({
+  name: zod.string(),
+  sortOrder: zod.number().optional(),
+});
+
+/**
+ * @summary Update a skill (admin)
+ */
+export const UpdateSkillParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateSkillBody = zod.object({
+  name: zod.string().optional(),
+  sortOrder: zod.number().optional(),
+});
+
+export const UpdateSkillResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  sortOrder: zod.number(),
+});
+
+/**
+ * @summary Delete a skill (admin)
+ */
+export const DeleteSkillParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary Get site settings
+ */
+export const GetSettingsResponse = zod.object({
+  id: zod.number(),
+  ownerName: zod.string(),
+  title: zod.string(),
+  subtitle: zod.string(),
+  heroImage: zod.string().nullish(),
+  aboutHeading: zod.string(),
+  aboutBody: zod.string(),
+  infoItems: zod.array(zod.string()),
+  location: zod.string(),
+  email: zod.string(),
+  phone: zod.string(),
+  linkedin: zod.string(),
+  archiveDateRange: zod.string(),
+  adminPasswordHash: zod.string().nullish(),
+});
+
+/**
+ * @summary Update site settings (admin)
+ */
+export const UpdateSettingsBody = zod.object({
+  ownerName: zod.string().optional(),
+  title: zod.string().optional(),
+  subtitle: zod.string().optional(),
+  heroImage: zod.string().nullish(),
+  aboutHeading: zod.string().optional(),
+  aboutBody: zod.string().optional(),
+  infoItems: zod.array(zod.string()).optional(),
+  location: zod.string().optional(),
+  email: zod.string().optional(),
+  phone: zod.string().optional(),
+  linkedin: zod.string().optional(),
+  archiveDateRange: zod.string().optional(),
+  adminPassword: zod.string().nullish(),
+});
+
+export const UpdateSettingsResponse = zod.object({
+  id: zod.number(),
+  ownerName: zod.string(),
+  title: zod.string(),
+  subtitle: zod.string(),
+  heroImage: zod.string().nullish(),
+  aboutHeading: zod.string(),
+  aboutBody: zod.string(),
+  infoItems: zod.array(zod.string()),
+  location: zod.string(),
+  email: zod.string(),
+  phone: zod.string(),
+  linkedin: zod.string(),
+  archiveDateRange: zod.string(),
+  adminPasswordHash: zod.string().nullish(),
 });

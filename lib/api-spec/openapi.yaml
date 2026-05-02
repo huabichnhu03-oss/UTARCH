@@ -10,13 +10,24 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: projects
+    description: Portfolio projects
+  - name: posts
+    description: Blog/news posts
+  - name: skills
+    description: Technical skills
+  - name: settings
+    description: Site settings
+  - name: uploads
+    description: File uploads
+  - name: admin
+    description: Admin authentication
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +35,357 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # Admin Auth
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginBody"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAuthStatus"
+        "401":
+          description: Invalid password
+  /admin/logout:
+    post:
+      operationId: adminLogout
+      tags: [admin]
+      summary: Admin logout
+      responses:
+        "200":
+          description: Logged out
+  /admin/me:
+    get:
+      operationId: adminMe
+      tags: [admin]
+      summary: Check admin auth status
+      responses:
+        "200":
+          description: Auth status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAuthStatus"
+
+  # Projects
+  /projects:
+    get:
+      operationId: listProjects
+      tags: [projects]
+      summary: List published projects
+      responses:
+        "200":
+          description: List of published projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+    post:
+      operationId: createProject
+      tags: [projects]
+      summary: Create a project (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProjectBody"
+      responses:
+        "201":
+          description: Created project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+  /projects/all:
+    get:
+      operationId: listAllProjects
+      tags: [projects]
+      summary: List all projects including drafts (admin)
+      responses:
+        "200":
+          description: All projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+  /projects/{id}:
+    get:
+      operationId: getProject
+      tags: [projects]
+      summary: Get a single project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Project detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "404":
+          description: Not found
+    put:
+      operationId: updateProject
+      tags: [projects]
+      summary: Update a project (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProjectBody"
+      responses:
+        "200":
+          description: Updated project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+    delete:
+      operationId: deleteProject
+      tags: [projects]
+      summary: Delete a project (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # Posts
+  /posts:
+    get:
+      operationId: listPosts
+      tags: [posts]
+      summary: List published posts
+      responses:
+        "200":
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+    post:
+      operationId: createPost
+      tags: [posts]
+      summary: Create a post (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostBody"
+      responses:
+        "201":
+          description: Created post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+  /posts/all:
+    get:
+      operationId: listAllPosts
+      tags: [posts]
+      summary: List all posts including drafts (admin)
+      responses:
+        "200":
+          description: All posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+  /posts/{id}:
+    get:
+      operationId: getPost
+      tags: [posts]
+      summary: Get a single post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Post detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          description: Not found
+    put:
+      operationId: updatePost
+      tags: [posts]
+      summary: Update a post (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePostBody"
+      responses:
+        "200":
+          description: Updated post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+    delete:
+      operationId: deletePost
+      tags: [posts]
+      summary: Delete a post (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # Skills
+  /skills:
+    get:
+      operationId: listSkills
+      tags: [skills]
+      summary: List all skills
+      responses:
+        "200":
+          description: Skills list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Skill"
+    post:
+      operationId: createSkill
+      tags: [skills]
+      summary: Create a skill (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSkillBody"
+      responses:
+        "201":
+          description: Created skill
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Skill"
+  /skills/{id}:
+    put:
+      operationId: updateSkill
+      tags: [skills]
+      summary: Update a skill (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSkillBody"
+      responses:
+        "200":
+          description: Updated skill
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Skill"
+    delete:
+      operationId: deleteSkill
+      tags: [skills]
+      summary: Delete a skill (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # Site Settings
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get site settings
+      responses:
+        "200":
+          description: Site settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+    put:
+      operationId: updateSettings
+      tags: [settings]
+      summary: Update site settings (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSettingsBody"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+
+
 components:
   schemas:
     HealthStatus:
@@ -33,4 +395,353 @@ components:
           type: string
       required:
         - status
+
+    AdminLoginBody:
+      type: object
+      properties:
+        password:
+          type: string
+      required:
+        - password
+
+    AdminAuthStatus:
+      type: object
+      properties:
+        authenticated:
+          type: boolean
+      required:
+        - authenticated
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        client:
+          type: string
+        subtitle:
+          type: string
+        role:
+          type: string
+        focus:
+          type: string
+        tools:
+          type: string
+        coverImage:
+          type: string
+          nullable: true
+        heroImage:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        methodologySteps:
+          type: array
+          items:
+            $ref: "#/components/schemas/MethodologyStep"
+        galleryImages:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+        published:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - title
+        - client
+        - subtitle
+        - role
+        - focus
+        - tools
+        - methodologySteps
+        - galleryImages
+        - sortOrder
+        - published
+        - createdAt
+
+    MethodologyStep:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+      required:
+        - title
+        - description
+
+    CreateProjectBody:
+      type: object
+      properties:
+        title:
+          type: string
+        client:
+          type: string
+        subtitle:
+          type: string
+        role:
+          type: string
+        focus:
+          type: string
+        tools:
+          type: string
+        coverImage:
+          type: string
+          nullable: true
+        heroImage:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        methodologySteps:
+          type: array
+          items:
+            $ref: "#/components/schemas/MethodologyStep"
+        galleryImages:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+        published:
+          type: boolean
+      required:
+        - title
+        - client
+        - subtitle
+        - role
+        - focus
+        - tools
+
+    UpdateProjectBody:
+      type: object
+      properties:
+        title:
+          type: string
+        client:
+          type: string
+        subtitle:
+          type: string
+        role:
+          type: string
+        focus:
+          type: string
+        tools:
+          type: string
+        coverImage:
+          type: string
+          nullable: true
+        heroImage:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        methodologySteps:
+          type: array
+          items:
+            $ref: "#/components/schemas/MethodologyStep"
+        galleryImages:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+        published:
+          type: boolean
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: string
+          nullable: true
+        content:
+          type: string
+        coverImage:
+          type: string
+          nullable: true
+        published:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - title
+        - slug
+        - content
+        - published
+        - createdAt
+        - updatedAt
+
+    CreatePostBody:
+      type: object
+      properties:
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: string
+          nullable: true
+        content:
+          type: string
+        coverImage:
+          type: string
+          nullable: true
+        published:
+          type: boolean
+      required:
+        - title
+        - slug
+        - content
+
+    UpdatePostBody:
+      type: object
+      properties:
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: string
+          nullable: true
+        content:
+          type: string
+        coverImage:
+          type: string
+          nullable: true
+        published:
+          type: boolean
+
+    Skill:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        sortOrder:
+          type: integer
+      required:
+        - id
+        - name
+        - sortOrder
+
+    CreateSkillBody:
+      type: object
+      properties:
+        name:
+          type: string
+        sortOrder:
+          type: integer
+      required:
+        - name
+
+    UpdateSkillBody:
+      type: object
+      properties:
+        name:
+          type: string
+        sortOrder:
+          type: integer
+
+    SiteSettings:
+      type: object
+      properties:
+        id:
+          type: integer
+        ownerName:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+        heroImage:
+          type: string
+          nullable: true
+        aboutHeading:
+          type: string
+        aboutBody:
+          type: string
+        infoItems:
+          type: array
+          items:
+            type: string
+        location:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        linkedin:
+          type: string
+        archiveDateRange:
+          type: string
+        adminPasswordHash:
+          type: string
+          nullable: true
+      required:
+        - id
+        - ownerName
+        - title
+        - subtitle
+        - aboutHeading
+        - aboutBody
+        - infoItems
+        - location
+        - email
+        - phone
+        - linkedin
+        - archiveDateRange
+
+    UpdateSettingsBody:
+      type: object
+      properties:
+        ownerName:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+        heroImage:
+          type: string
+          nullable: true
+        aboutHeading:
+          type: string
+        aboutBody:
+          type: string
+        infoItems:
+          type: array
+          items:
+            type: string
+        location:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        linkedin:
+          type: string
+        archiveDateRange:
+          type: string
+        adminPassword:
+          type: string
+          nullable: true
 
