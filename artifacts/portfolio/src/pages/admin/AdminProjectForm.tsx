@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -44,6 +43,8 @@ export default function AdminProjectForm() {
       coverImage: "",
       heroImage: "",
       description: "",
+      outcomes: "",
+      highlightStats: [] as { label: string; value: string }[],
       methodologySteps: [],
       galleryImages: [""],
       sortOrder: 0,
@@ -61,8 +62,14 @@ export default function AdminProjectForm() {
     name: "galleryImages" as never
   });
 
+  const { fields: statFields, append: appendStat, remove: removeStat } = useFieldArray({
+    control: form.control,
+    name: "highlightStats"
+  });
+
   useEffect(() => {
     if (project && isEditing) {
+      const p = project as any;
       form.reset({
         title: project.title,
         client: project.client,
@@ -73,6 +80,8 @@ export default function AdminProjectForm() {
         coverImage: project.coverImage || "",
         heroImage: project.heroImage || "",
         description: project.description || "",
+        outcomes: p.outcomes || "",
+        highlightStats: p.highlightStats || [],
         methodologySteps: project.methodologySteps || [],
         galleryImages: project.galleryImages.length > 0 ? project.galleryImages : [""],
         sortOrder: project.sortOrder,
@@ -82,10 +91,10 @@ export default function AdminProjectForm() {
   }, [project, isEditing, form]);
 
   const onSubmit = (values: any) => {
-    // Filter empty gallery images
     const cleanValues = {
       ...values,
-      galleryImages: values.galleryImages.filter((img: string) => img.trim() !== "")
+      galleryImages: values.galleryImages.filter((img: string) => img.trim() !== ""),
+      outcomes: values.outcomes?.trim() || null,
     };
 
     if (isEditing) {
@@ -137,14 +146,12 @@ export default function AdminProjectForm() {
                 
                 <div className="space-y-4 p-6 border border-border bg-muted/10">
                   <h2 className="mono text-sm font-bold uppercase tracking-widest text-primary border-b border-border pb-2">BASIC_INFO</h2>
-                  
                   <FormField control={form.control} name="title" render={({ field }) => (
                     <FormItem><FormLabel>Title</FormLabel><FormControl><Input className="rounded-none" {...field} /></FormControl><FormMessage /></FormItem>
                   )} />
                   <FormField control={form.control} name="subtitle" render={({ field }) => (
                     <FormItem><FormLabel>Subtitle (Short description)</FormLabel><FormControl><Input className="rounded-none" {...field} /></FormControl><FormMessage /></FormItem>
                   )} />
-                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="client" render={({ field }) => (
                       <FormItem><FormLabel>Client</FormLabel><FormControl><Input className="rounded-none" {...field} /></FormControl><FormMessage /></FormItem>
@@ -174,8 +181,38 @@ export default function AdminProjectForm() {
                 <div className="space-y-4 p-6 border border-border bg-muted/10">
                   <h2 className="mono text-sm font-bold uppercase tracking-widest text-primary border-b border-border pb-2">CONTENT</h2>
                   <FormField control={form.control} name="description" render={({ field }) => (
-                    <FormItem><FormLabel>Full Description</FormLabel><FormControl><Textarea className="rounded-none min-h-[200px]" {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Full Description / Project Brief</FormLabel><FormControl><Textarea className="rounded-none min-h-[160px]" {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
                   )} />
+                  <FormField control={form.control} name="outcomes" render={({ field }) => (
+                    <FormItem><FormLabel>Outcomes & Results</FormLabel><p className="text-xs text-muted-foreground mb-1">What was achieved, delivered, or learned.</p><FormControl><Textarea className="rounded-none min-h-[120px]" {...field} value={field.value || ""} placeholder="e.g. Permit approved in 3 weeks. Successfully delivered 48 construction drawings..." /></FormControl><FormMessage /></FormItem>
+                  )} />
+                </div>
+
+                {/* HIGHLIGHT STATS */}
+                <div className="space-y-4 p-6 border border-border bg-muted/10">
+                  <div className="flex justify-between items-center border-b border-border pb-2">
+                    <div>
+                      <h2 className="mono text-sm font-bold uppercase tracking-widest text-primary">PROJECT_STATS</h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">Key numbers shown on the project page (e.g. Area: 2,400 sq ft)</p>
+                    </div>
+                    <Button type="button" variant="outline" size="sm" onClick={() => appendStat({ label: "", value: "" })} className="h-7 text-xs rounded-none">
+                      <Plus className="w-3 h-3 mr-1" /> Add Stat
+                    </Button>
+                  </div>
+                  {statFields.map((field, index) => (
+                    <div key={field.id} className="flex gap-2 items-start">
+                      <FormField control={form.control} name={`highlightStats.${index}.label`} render={({ field }) => (
+                        <FormItem className="flex-1"><FormControl><Input placeholder="Label (e.g. Area)" className="rounded-none" {...field} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                      <FormField control={form.control} name={`highlightStats.${index}.value`} render={({ field }) => (
+                        <FormItem className="flex-1"><FormControl><Input placeholder="Value (e.g. 2,400 sq ft)" className="rounded-none" {...field} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                      <Button type="button" variant="outline" onClick={() => removeStat(index)} className="rounded-none text-destructive shrink-0 h-9 w-9 p-0">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  {statFields.length === 0 && <p className="text-sm text-muted-foreground italic">No stats added.</p>}
                 </div>
 
                 <div className="space-y-4 p-6 border border-border bg-muted/10">
@@ -185,7 +222,6 @@ export default function AdminProjectForm() {
                       <Plus className="w-3 h-3 mr-1" /> Add Step
                     </Button>
                   </div>
-                  
                   {stepFields.map((field, index) => (
                     <div key={field.id} className="relative p-4 border border-border bg-background space-y-3">
                       <Button type="button" variant="ghost" size="sm" onClick={() => removeStep(index)} className="absolute top-2 right-2 text-destructive hover:bg-destructive/10 h-6 w-6 p-0 rounded-none">
@@ -209,7 +245,6 @@ export default function AdminProjectForm() {
                       <Plus className="w-3 h-3 mr-1" /> Add Image
                     </Button>
                   </div>
-                  
                   {galleryFields.map((field, index) => (
                     <div key={field.id} className="flex gap-2 items-start">
                       <FormField control={form.control} name={`galleryImages.${index}`} render={({ field }) => (
@@ -224,23 +259,21 @@ export default function AdminProjectForm() {
 
                 <div className="space-y-4 p-6 border border-border bg-muted/10">
                   <h2 className="mono text-sm font-bold uppercase tracking-widest text-primary border-b border-border pb-2">SETTINGS</h2>
-                  <div className="flex items-center space-x-2">
-                    <FormField control={form.control} name="published" render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-4 border border-border bg-background w-full">
-                        <FormControl>
-                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel>Publish Project</FormLabel>
-                          <p className="text-sm text-muted-foreground">Visible to public on the website</p>
-                        </div>
-                      </FormItem>
-                    )} />
-                  </div>
+                  <FormField control={form.control} name="published" render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-4 border border-border bg-background w-full">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Publish Project</FormLabel>
+                        <p className="text-sm text-muted-foreground">Visible to public on the website</p>
+                      </div>
+                    </FormItem>
+                  )} />
                 </div>
 
-                <div className="pt-4 flex gap-4">
-                  <Button type="submit" disabled={createProject.isPending || updateProject.isPending} className="flex-1 rounded-none bg-primary hover:bg-accent mono font-bold uppercase tracking-widest text-white">
+                <div className="pt-4">
+                  <Button type="submit" disabled={createProject.isPending || updateProject.isPending} className="w-full rounded-none bg-primary hover:bg-accent mono font-bold uppercase tracking-widest text-white">
                     {createProject.isPending || updateProject.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                     {isEditing ? "SAVE_CHANGES" : "CREATE_PROJECT"}
                   </Button>
@@ -252,11 +285,9 @@ export default function AdminProjectForm() {
           <div className="xl:col-span-1">
             <div className="sticky top-4">
               <h3 className="font-bold text-sm uppercase mono mb-4 text-primary">IMAGE_UPLOADER</h3>
-              <Uploader onUploadComplete={(url) => {
-                // User can copy it, don't auto-fill to a specific field since there are many image fields
-              }} />
+              <Uploader />
               <p className="text-xs text-muted-foreground mt-4">
-                Upload images here to get URLs, then paste those URLs into the Cover, Hero, or Gallery fields.
+                Upload images here to get URLs, then paste into Cover, Hero, or Gallery fields.
               </p>
             </div>
           </div>

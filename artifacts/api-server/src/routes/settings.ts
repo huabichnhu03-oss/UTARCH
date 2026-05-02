@@ -28,6 +28,8 @@ function mapSettings(row: typeof siteSettingsTable.$inferSelect) {
     phone: row.phone,
     linkedin: row.linkedin,
     archiveDateRange: row.archiveDateRange,
+    primaryColor: row.primaryColor ?? "#0033A0",
+    accentColor: row.accentColor ?? "#FF4A22",
     adminPasswordHash: null,
   };
 }
@@ -52,7 +54,8 @@ router.put("/settings", requireAdmin, async (req: Request, res: Response) => {
     ownerName: string; title: string; subtitle: string; heroImage: string | null;
     aboutHeading: string; aboutBody: string; infoItems: string[];
     location: string; email: string; phone: string; linkedin: string;
-    archiveDateRange: string; adminPassword: string | null;
+    archiveDateRange: string; primaryColor: string; accentColor: string;
+    adminPassword: string | null;
   }>;
 
   try {
@@ -71,6 +74,8 @@ router.put("/settings", requireAdmin, async (req: Request, res: Response) => {
     if (body.phone !== undefined) updateData.phone = body.phone;
     if (body.linkedin !== undefined) updateData.linkedin = body.linkedin;
     if (body.archiveDateRange !== undefined) updateData.archiveDateRange = body.archiveDateRange;
+    if (body.primaryColor !== undefined) updateData.primaryColor = body.primaryColor;
+    if (body.accentColor !== undefined) updateData.accentColor = body.accentColor;
     if (body.adminPassword) {
       updateData.adminPasswordHash = await bcrypt.hash(body.adminPassword, 10);
     }

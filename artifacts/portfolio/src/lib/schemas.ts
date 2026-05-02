@@ -13,6 +13,8 @@ export const siteSettingsSchema = z.object({
   phone: z.string().min(1, "Required"),
   linkedin: z.string().url(),
   archiveDateRange: z.string().min(1, "Required"),
+  primaryColor: z.string().optional(),
+  accentColor: z.string().optional(),
   adminPassword: z.string().nullable().optional(),
 });
 
@@ -26,6 +28,11 @@ export const projectSchema = z.object({
   coverImage: z.string().nullable().optional(),
   heroImage: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
+  outcomes: z.string().nullable().optional(),
+  highlightStats: z.array(z.object({
+    label: z.string().min(1, "Required"),
+    value: z.string().min(1, "Required"),
+  })).optional(),
   methodologySteps: z.array(z.object({
     title: z.string().min(1, "Required"),
     description: z.string().min(1, "Required")

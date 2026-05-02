@@ -13,6 +13,8 @@ export const projectsTable = pgTable("projects", {
   coverImage: text("cover_image"),
   heroImage: text("hero_image"),
   description: text("description"),
+  outcomes: text("outcomes"),
+  highlightStats: jsonb("highlight_stats").notNull().$type<{ label: string; value: string }[]>().default([]),
   methodologySteps: jsonb("methodology_steps").notNull().$type<{ title: string; description: string }[]>().default([]),
   galleryImages: jsonb("gallery_images").notNull().$type<string[]>().default([]),
   sortOrder: integer("sort_order").notNull().default(0),

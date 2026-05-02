@@ -1,7 +1,8 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useEffect } from "react";
 import NotFound from "@/pages/not-found";
 
 import Home from "@/pages/Home";
@@ -20,6 +21,59 @@ import AdminSettings from "@/pages/admin/AdminSettings";
 import AdminUploads from "@/pages/admin/AdminUploads";
 
 const queryClient = new QueryClient();
+
+function hexToHslComponents(hex: string): string {
+  const clean = hex.replace("#", "");
+  const r = parseInt(clean.slice(0, 2), 16) / 255;
+  const g = parseInt(clean.slice(2, 4), 16) / 255;
+  const b = parseInt(clean.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+  return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+}
+
+function ThemeApplicator() {
+  const { data: settings } = useQuery({
+    queryKey: ["settings-theme"],
+    queryFn: async () => {
+      const res = await fetch("/api/settings", { credentials: "include" });
+      return res.json() as Promise<{ primaryColor?: string; accentColor?: string }>;
+    },
+    staleTime: 30_000,
+  });
+
+  useEffect(() => {
+    if (!settings) return;
+    const root = document.documentElement;
+    if (settings.primaryColor) {
+      const hsl = hexToHslComponents(settings.primaryColor);
+      root.style.setProperty("--c-blue", hsl);
+      root.style.setProperty("--primary", hsl);
+      root.style.setProperty("--border", hsl);
+      root.style.setProperty("--input", hsl);
+      root.style.setProperty("--ring", hsl);
+    }
+    if (settings.accentColor) {
+      const hsl = hexToHslComponents(settings.accentColor);
+      root.style.setProperty("--c-accent", hsl);
+      root.style.setProperty("--accent", hsl);
+    }
+  }, [settings]);
+
+  return null;
+}
 
 function Router() {
   return (
@@ -55,6 +109,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <ThemeApplicator />
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
           <Router />
         </WouterRouter>

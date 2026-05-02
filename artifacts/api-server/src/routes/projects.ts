@@ -25,6 +25,8 @@ function mapProject(p: typeof projectsTable.$inferSelect) {
     coverImage: p.coverImage ?? null,
     heroImage: p.heroImage ?? null,
     description: p.description ?? null,
+    outcomes: p.outcomes ?? null,
+    highlightStats: (p.highlightStats as { label: string; value: string }[]) ?? [],
     methodologySteps: (p.methodologySteps as { title: string; description: string }[]) ?? [],
     galleryImages: (p.galleryImages as string[]) ?? [],
     sortOrder: p.sortOrder,
@@ -74,6 +76,7 @@ router.post("/projects", requireAdmin, async (req: Request, res: Response) => {
   const body = req.body as {
     title: string; client: string; subtitle: string; role: string; focus: string; tools: string;
     coverImage?: string | null; heroImage?: string | null; description?: string | null;
+    outcomes?: string | null; highlightStats?: { label: string; value: string }[];
     methodologySteps?: { title: string; description: string }[]; galleryImages?: string[];
     sortOrder?: number; published?: boolean;
   };
@@ -88,6 +91,8 @@ router.post("/projects", requireAdmin, async (req: Request, res: Response) => {
       coverImage: body.coverImage ?? null,
       heroImage: body.heroImage ?? null,
       description: body.description ?? null,
+      outcomes: body.outcomes ?? null,
+      highlightStats: body.highlightStats ?? [],
       methodologySteps: body.methodologySteps ?? [],
       galleryImages: body.galleryImages ?? [],
       sortOrder: body.sortOrder ?? 0,
@@ -106,6 +111,7 @@ router.put("/projects/:id", requireAdmin, async (req: Request, res: Response) =>
   const body = req.body as Partial<{
     title: string; client: string; subtitle: string; role: string; focus: string; tools: string;
     coverImage: string | null; heroImage: string | null; description: string | null;
+    outcomes: string | null; highlightStats: { label: string; value: string }[];
     methodologySteps: { title: string; description: string }[]; galleryImages: string[];
     sortOrder: number; published: boolean;
   }>;
