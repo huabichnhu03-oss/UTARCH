@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "VyoS9eEDz1cjn-RUHgBKB"
+uri = "file://portfolio_backup.tar.gz"
+type = "unspecified"
+title = "Portfolio Database Backup"
