@@ -1,10 +1,9 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import multer from "multer";
-import { ObjectStorageService } from "../lib/objectStorage";
+import { objectStorageClient } from "../lib/objectStorage";
 
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
-const objectStorageService = new ObjectStorageService();
 
 function requireAdmin(req: Request, res: Response, next: () => void) {
   const isAdmin = (req.session as unknown as Record<string, unknown>)["isAdmin"] === true;
@@ -13,6 +12,17 @@ function requireAdmin(req: Request, res: Response, next: () => void) {
     return;
   }
   next();
+}
+
+function getPublicStoragePath(): { bucketName: string; prefix: string } {
+  const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
+  const firstPath = pathsStr.split(",")[0]?.trim();
+  if (!firstPath) throw new Error("PUBLIC_OBJECT_SEARCH_PATHS not configured");
+
+  const parts = firstPath.startsWith("/") ? firstPath.slice(1).split("/") : firstPath.split("/");
+  const bucketName = parts[0];
+  const prefix = parts.slice(1).join("/");
+  return { bucketName, prefix };
 }
 
 router.post("/uploads", requireAdmin, upload.single("file"), async (req: Request, res: Response) => {
@@ -24,25 +34,20 @@ router.post("/uploads", requireAdmin, upload.single("file"), async (req: Request
   try {
     const { originalname, mimetype, buffer } = req.file;
     const ext = originalname.split(".").pop() ?? "bin";
-    const key = `uploads/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-    const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
-    if (!bucketId) {
-      res.status(500).json({ error: "Object storage not configured" });
-      return;
-    }
+    const { bucketName, prefix } = getPublicStoragePath();
+    const objectName = prefix ? `${prefix}/${filename}` : filename;
 
-    const { objectStorageClient } = await import("../lib/objectStorage");
-    const bucket = objectStorageClient.bucket(bucketId);
-    const file = bucket.file(key);
+    const bucket = objectStorageClient.bucket(bucketName);
+    const file = bucket.file(objectName);
 
     await file.save(buffer, {
       metadata: { contentType: mimetype },
-      public: true,
     });
 
-    const url = `https://storage.googleapis.com/${bucketId}/${key}`;
-    res.json({ url, key });
+    const url = `/api/storage/public-objects/${filename}`;
+    res.json({ url, key: objectName });
   } catch (err) {
     req.log.error({ err }, "Error uploading file");
     res.status(500).json({ error: "Upload failed" });
