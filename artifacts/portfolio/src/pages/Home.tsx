@@ -28,7 +28,7 @@ export default function Home() {
         <section className="border-b border-border grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border">
           <div className="p-8 lg:p-16 flex flex-col justify-center">
             <motion.h1
-              className="text-5xl lg:text-7xl font-bold uppercase tracking-tighter leading-[0.9] text-primary break-words"
+              className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase tracking-tighter leading-[0.92] text-primary hyphens-none"
               initial={{ opacity: 0, y: 32 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
@@ -68,20 +68,22 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* INFO BAR */}
+        {/* INFO BAR — scrolling marquee */}
         <motion.div
-          className="bg-primary text-white border-b border-border p-3 overflow-x-auto whitespace-nowrap scrollbar-hide"
+          className="bg-primary text-white border-b border-border py-3 overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.35 }}
         >
-          <div className="flex gap-8 items-center mono text-xs uppercase tracking-wider max-w-screen-2xl mx-auto px-4">
-            {(settings?.infoItems || ["DRAFTING", "3D MODELING", "PERMIT DRAWINGS", "CONSTRUCTION DOCUMENTS"]).map((item, i) => (
-              <div key={i} className="flex items-center gap-8">
-                <span>{item}</span>
-                {i < (settings?.infoItems?.length || 4) - 1 && <span className="opacity-50">+</span>}
-              </div>
-            ))}
+          <div className="flex animate-marquee whitespace-nowrap">
+            {[...Array(3)].map((_, rep) =>
+              (settings?.infoItems || ["BASED IN TORONTO", "AVAILABLE FOR HIRE", "OBC & LEED COMPLIANT", "PERMIT DRAWINGS", "3D MODELING", "CONSTRUCTION DOCS"]).map((item, i, arr) => (
+                <span key={`${rep}-${i}`} className="mono text-xs uppercase tracking-wider mx-6 flex items-center gap-6">
+                  {item}
+                  <span className="opacity-40">+</span>
+                </span>
+              ))
+            )}
           </div>
         </motion.div>
 
