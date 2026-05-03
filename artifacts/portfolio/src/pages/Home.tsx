@@ -200,6 +200,58 @@ export default function Home() {
             </AnimatePresence>
           </div>
         </section>
+        {/* CONTACT / CTA SECTION */}
+        <motion.section
+          className="border-t border-border grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+        >
+          <div className="p-10 lg:p-16 flex flex-col justify-center">
+            <p className="mono text-xs text-muted-foreground uppercase tracking-widest mb-4">CONTACT</p>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tighter leading-tight text-primary mb-4">
+              Let's work<br />together.
+            </h2>
+            <p className="text-base text-muted-foreground max-w-sm leading-relaxed">
+              Have a project in mind or looking to collaborate? Reach out — I'd love to hear from you.
+            </p>
+          </div>
+          <div className="p-10 lg:p-16 flex flex-col justify-center gap-6">
+            {settings?.email && (
+              <div>
+                <p className="mono text-[10px] text-muted-foreground uppercase tracking-widest mb-2">Email</p>
+                <a
+                  href={`mailto:${settings.email}`}
+                  className="inline-flex items-center gap-3 bg-primary text-white font-bold uppercase tracking-widest mono text-sm px-6 py-4 hover:bg-primary/90 transition-colors group"
+                >
+                  {settings.email}
+                  <MoveRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
+            )}
+            {settings?.linkedin && (
+              <div>
+                <p className="mono text-[10px] text-muted-foreground uppercase tracking-widest mb-2">LinkedIn</p>
+                <a
+                  href={settings.linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-3 border border-border text-foreground font-bold uppercase tracking-widest mono text-sm px-6 py-4 hover:border-primary hover:text-primary transition-colors group"
+                >
+                  View Profile
+                  <MoveRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
+            )}
+            {settings?.location && (
+              <div>
+                <p className="mono text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Based in</p>
+                <p className="mono text-sm font-medium">{settings.location}</p>
+              </div>
+            )}
+          </div>
+        </motion.section>
       </main>
 
       <Footer />
