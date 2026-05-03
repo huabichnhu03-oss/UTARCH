@@ -4,6 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Link } from "wouter";
 import { MoveRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { BuildingModel } from "@/components/BuildingModel";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -53,17 +54,7 @@ export default function Home() {
             {settings?.heroImage ? (
               <img src={settings.heroImage} alt="Hero" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
             ) : (
-              <div className="text-muted-foreground mono opacity-50 absolute inset-0 flex items-center justify-center border-border">
-                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                      <rect width="40" height="40" fill="none" className="stroke-border/20" />
-                    </pattern>
-                  </defs>
-                  <rect width="100%" height="100%" fill="url(#grid)" />
-                </svg>
-                <span className="absolute bg-background px-4 py-2 border border-border">HERO_ELEVATION.DWG</span>
-              </div>
+              <BuildingModel />
             )}
           </motion.div>
         </section>
