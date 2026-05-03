@@ -19,6 +19,7 @@ function mapProject(p: typeof projectsTable.$inferSelect) {
     title: p.title,
     client: p.client,
     subtitle: p.subtitle,
+    category: p.category ?? "",
     role: p.role,
     focus: p.focus,
     tools: p.tools,
@@ -75,7 +76,7 @@ router.get("/projects/:id", async (req: Request, res: Response) => {
 
 router.post("/projects", requireAdmin, async (req: Request, res: Response) => {
   const body = req.body as {
-    title: string; client: string; subtitle: string; role: string; focus: string; tools: string;
+    title: string; client: string; subtitle: string; category?: string; role: string; focus: string; tools: string;
     coverImage?: string | null; heroImage?: string | null; description?: string | null;
     outcomes?: string | null;
     highlightStats?: { label: string; value: string }[];
@@ -89,6 +90,7 @@ router.post("/projects", requireAdmin, async (req: Request, res: Response) => {
       title: body.title,
       client: body.client,
       subtitle: body.subtitle,
+      category: body.category ?? "",
       role: body.role,
       focus: body.focus,
       tools: body.tools,
@@ -114,7 +116,7 @@ router.put("/projects/:id", requireAdmin, async (req: Request, res: Response) =>
   const id = parseInt(req.params.id ?? "");
   if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
   const body = req.body as Partial<{
-    title: string; client: string; subtitle: string; role: string; focus: string; tools: string;
+    title: string; client: string; subtitle: string; category: string; role: string; focus: string; tools: string;
     coverImage: string | null; heroImage: string | null; description: string | null;
     outcomes: string | null;
     highlightStats: { label: string; value: string }[];

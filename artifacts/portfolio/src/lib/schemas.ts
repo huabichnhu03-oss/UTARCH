@@ -22,6 +22,7 @@ export const projectSchema = z.object({
   title: z.string().min(1, "Required"),
   client: z.string().min(1, "Required"),
   subtitle: z.string().min(1, "Required"),
+  category: z.string().optional(),
   role: z.string().min(1, "Required"),
   focus: z.string().min(1, "Required"),
   tools: z.string().min(1, "Required"),

@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { useGetSettings, useListProjects, useListSkills } from "@workspace/api-client-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Link } from "wouter";
 import { MoveRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { BuildingModel } from "@/components/BuildingModel";
 
 const fadeUp = {
@@ -15,10 +16,25 @@ const fadeUp = {
   })
 };
 
+function effectiveCategory(p: { category?: string; role: string }): string {
+  const cat = (p.category || "").trim();
+  return cat !== "" ? cat.toUpperCase() : p.role.toUpperCase();
+}
+
 export default function Home() {
   const { data: settings } = useGetSettings();
   const { data: projects = [] } = useListProjects();
   const { data: skills = [] } = useListSkills();
+  const [activeFilter, setActiveFilter] = useState("ALL");
+
+  const availableFilters = [
+    "ALL",
+    ...Array.from(new Set(projects.map(effectiveCategory))).sort(),
+  ];
+
+  const filteredProjects = activeFilter === "ALL"
+    ? projects
+    : projects.filter((p) => effectiveCategory(p) === activeFilter);
 
   return (
     <div className="min-h-[100dvh] flex flex-col">
@@ -121,9 +137,33 @@ export default function Home() {
             <h2 className="mono text-sm text-primary uppercase font-bold tracking-widest">PROJECT_ARCHIVE</h2>
             <span className="mono text-xs text-muted-foreground">{settings?.archiveDateRange || "2020-PRESENT"}</span>
           </motion.div>
+
+          {/* FILTER TABS */}
+          <motion.div
+            className="flex flex-wrap gap-0 border-b border-border overflow-x-auto"
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            {availableFilters.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveFilter(cat)}
+                className={`mono text-xs uppercase tracking-widest px-5 py-3 border-r border-border transition-colors shrink-0 ${
+                  activeFilter === cat
+                    ? "bg-primary text-white"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-border border-b border-border flex-1">
-            {projects.map((project, i) => (
+            <AnimatePresence mode="popLayout">
+            {filteredProjects.map((project, i) => (
               <motion.div
                 key={project.id}
                 variants={fadeUp}
@@ -157,6 +197,7 @@ export default function Home() {
                 </Link>
               </motion.div>
             ))}
+            </AnimatePresence>
           </div>
         </section>
       </main>

@@ -27,6 +27,7 @@ export interface Project {
   title: string;
   client: string;
   subtitle: string;
+  category?: string;
   role: string;
   focus: string;
   tools: string;
@@ -44,6 +45,7 @@ export interface CreateProjectBody {
   title: string;
   client: string;
   subtitle: string;
+  category?: string;
   role: string;
   focus: string;
   tools: string;
@@ -60,6 +62,7 @@ export interface UpdateProjectBody {
   title?: string;
   client?: string;
   subtitle?: string;
+  category?: string;
   role?: string;
   focus?: string;
   tools?: string;

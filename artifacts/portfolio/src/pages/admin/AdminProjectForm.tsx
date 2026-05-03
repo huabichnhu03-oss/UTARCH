@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -35,7 +36,7 @@ export default function AdminProjectForm() {
   const form = useForm({
     resolver: zodResolver(projectSchema),
     defaultValues: {
-      title: "", client: "", subtitle: "", role: "", focus: "", tools: "",
+      title: "", client: "", subtitle: "", category: "", role: "", focus: "", tools: "",
       coverImage: "", heroImage: "", description: "", outcomes: "",
       highlightStats: [] as { label: string; value: string }[],
       plans: [] as { title: string; url: string }[],
@@ -55,6 +56,7 @@ export default function AdminProjectForm() {
       const p = project as any;
       form.reset({
         title: project.title, client: project.client, subtitle: project.subtitle,
+        category: project.category || "",
         role: project.role, focus: project.focus, tools: project.tools,
         coverImage: project.coverImage || "", heroImage: project.heroImage || "",
         description: project.description || "", outcomes: p.outcomes || "",
@@ -122,6 +124,26 @@ export default function AdminProjectForm() {
                   )} />
                   <FormField control={form.control} name="subtitle" render={({ field }) => (
                     <FormItem><FormLabel>Subtitle</FormLabel><FormControl><Input className="rounded-none" {...field} /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <FormField control={form.control} name="category" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                        <FormControl>
+                          <SelectTrigger className="rounded-none">
+                            <SelectValue placeholder="Select a category..." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="RESIDENTIAL">Residential</SelectItem>
+                          <SelectItem value="COMMERCIAL">Commercial</SelectItem>
+                          <SelectItem value="MIXED USE">Mixed Use</SelectItem>
+                          <SelectItem value="INSTITUTIONAL">Institutional</SelectItem>
+                          <SelectItem value="INDUSTRIAL">Industrial</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
                   )} />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="client" render={({ field }) => (
