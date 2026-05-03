@@ -52,7 +52,7 @@
 
 :root {
   /* Crimson Red theme */
-  --c-blue: 6 54% 46%; /* #C0392B — primary signature red */
+  --c-primary: 6 54% 46%; /* #C0392B — primary signature red */
   --c-white: 0 0% 100%; /* #FFFFFF */
   --c-accent: 0 0% 18%; /* #2D2D2D — warm charcoal accent */
   --c-text: 0 0% 11%; /* #1C1C1E */
@@ -61,21 +61,21 @@
   --background: var(--c-white);
   --foreground: var(--c-text);
 
-  --border: var(--c-blue);
+  --border: var(--c-primary);
 
   --card: var(--c-white);
   --card-foreground: var(--c-text);
-  --card-border: var(--c-blue);
+  --card-border: var(--c-primary);
 
   --popover: var(--c-white);
   --popover-foreground: var(--c-text);
-  --popover-border: var(--c-blue);
+  --popover-border: var(--c-primary);
 
-  --primary: var(--c-blue);
+  --primary: var(--c-primary);
   --primary-foreground: var(--c-white);
 
   --secondary: var(--c-white);
-  --secondary-foreground: var(--c-blue);
+  --secondary-foreground: var(--c-primary);
 
   --muted: 210 40% 96.1%;
   --muted-foreground: var(--c-muted);
@@ -86,8 +86,8 @@
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: var(--c-white);
 
-  --input: var(--c-blue);
-  --ring: var(--c-blue);
+  --input: var(--c-primary);
+  --ring: var(--c-primary);
 
   --app-font-sans: 'Inter', sans-serif;
   --app-font-mono: 'Space Mono', monospace;

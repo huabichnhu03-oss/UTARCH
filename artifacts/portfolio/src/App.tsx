@@ -59,7 +59,7 @@ function ThemeApplicator() {
     const root = document.documentElement;
     if (settings.primaryColor) {
       const hsl = hexToHslComponents(settings.primaryColor);
-      root.style.setProperty("--c-blue", hsl);
+      root.style.setProperty("--c-primary", hsl);
       root.style.setProperty("--primary", hsl);
       root.style.setProperty("--border", hsl);
       root.style.setProperty("--input", hsl);

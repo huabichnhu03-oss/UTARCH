@@ -65,7 +65,7 @@ function usePrimaryColor(): string {
   useEffect(() => {
     const read = () => {
       const raw = getComputedStyle(document.documentElement)
-        .getPropertyValue("--c-blue")
+        .getPropertyValue("--c-primary")
         .trim();
       if (raw) setColor(hslComponentsToHex(raw));
     };
