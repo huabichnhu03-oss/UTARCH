@@ -51,11 +51,11 @@
 }
 
 :root {
-  /* Blueprint aesthetic */
-  --c-blue: 221 100% 31%; /* #0033A0 */
+  /* Crimson Red theme */
+  --c-blue: 6 54% 46%; /* #C0392B — primary signature red */
   --c-white: 0 0% 100%; /* #FFFFFF */
-  --c-accent: 11 100% 57%; /* #FF4A22 */
-  --c-text: 216 65% 11%; /* #0A192F */
+  --c-accent: 0 0% 18%; /* #2D2D2D — warm charcoal accent */
+  --c-text: 0 0% 11%; /* #1C1C1E */
   --c-muted: 215 16% 47%; /* #64748B */
 
   --background: var(--c-white);

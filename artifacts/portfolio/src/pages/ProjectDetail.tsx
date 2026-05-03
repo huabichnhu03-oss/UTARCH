@@ -15,6 +15,15 @@ const fadeUp = {
   })
 };
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="w-0.5 h-5 bg-primary shrink-0" />
+      <span className="mono text-sm text-primary uppercase tracking-widest font-bold">{children}</span>
+    </div>
+  );
+}
+
 function PlanViewer({ plan, index }: { plan: { title: string; url: string }; index: number }) {
   const [lightbox, setLightbox] = useState(false);
   const isPdf = plan.url.toLowerCase().endsWith(".pdf") || plan.url.includes(".pdf");
@@ -157,7 +166,7 @@ export default function ProjectDetail() {
         <Navbar />
         <main className="flex-1 flex flex-col items-center justify-center p-8 text-center">
           <h1 className="text-2xl font-bold mb-4">Project Not Found</h1>
-          <Link href="/" className="text-accent hover:underline flex items-center gap-2">
+          <Link href="/" className="text-primary hover:underline flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" /> Back to Archive
           </Link>
         </main>
@@ -171,14 +180,15 @@ export default function ProjectDetail() {
       <Navbar />
 
       <main className="flex-1 flex flex-col">
-        {/* HEADER */}
+
+        {/* 1. HEADER — title + back nav */}
         <motion.div
           className="border-b border-border flex"
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
-          <Link href="/" className="px-6 py-4 border-r border-border hover:bg-accent hover:text-white transition-colors flex items-center shrink-0">
+          <Link href="/" className="px-6 py-4 border-r border-border hover:bg-primary hover:text-white transition-colors flex items-center shrink-0">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="p-4 px-6 flex flex-col justify-center flex-1">
@@ -189,12 +199,28 @@ export default function ProjectDetail() {
           </div>
         </motion.div>
 
-        {/* METADATA BAR */}
+        {/* 2. HERO IMAGE — full-width, first visual impact */}
+        {(project.heroImage || project.coverImage) && (
+          <motion.div
+            className="aspect-[21/9] md:aspect-[3/1] bg-muted border-b border-border relative overflow-hidden"
+            initial={{ opacity: 0, scale: 1.02 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <img
+              src={project.heroImage || project.coverImage || ""}
+              alt={project.title}
+              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+            />
+          </motion.div>
+        )}
+
+        {/* 3. METADATA STRIP — context (Client, Role, Focus, Tools) */}
         <motion.div
           className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border border-b border-border bg-muted/20"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
         >
           {[
             { label: "CLIENT", value: project.client },
@@ -204,19 +230,19 @@ export default function ProjectDetail() {
           ].map((item) => (
             <div key={item.label} className="p-4 border-b md:border-b-0 border-border">
               <span className="mono text-[10px] text-muted-foreground uppercase block mb-1">{item.label}</span>
-              <span className="mono text-sm font-bold">{item.value}</span>
+              <span className="mono text-sm font-bold text-foreground">{item.value}</span>
             </div>
           ))}
         </motion.div>
 
-        {/* HIGHLIGHT STATS */}
+        {/* 4. HIGHLIGHT STATS */}
         {p?.highlightStats && p.highlightStats.length > 0 && (
           <motion.div
             className="grid border-b border-border bg-primary text-white"
             style={{ gridTemplateColumns: `repeat(${Math.min(p.highlightStats.length, 4)}, 1fr)` }}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.15 }}
+            transition={{ duration: 0.45, delay: 0.2 }}
           >
             {p.highlightStats.map((stat: { label: string; value: string }, i: number) => (
               <div key={i} className="p-5 border-r border-white/20 last:border-r-0 text-center">
@@ -227,23 +253,7 @@ export default function ProjectDetail() {
           </motion.div>
         )}
 
-        {/* HERO IMAGE */}
-        {(project.heroImage || project.coverImage) && (
-          <motion.div
-            className="aspect-[21/9] md:aspect-[3/1] bg-muted border-b border-border relative overflow-hidden"
-            initial={{ opacity: 0, scale: 1.02 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <img
-              src={project.heroImage || project.coverImage || ""}
-              alt={project.title}
-              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
-            />
-          </motion.div>
-        )}
-
-        {/* BRIEF & METHODOLOGY */}
+        {/* 5. CONCEPT — project brief + methodology */}
         <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-border border-b border-border">
           <motion.div
             className="lg:col-span-2 p-8 lg:p-12"
@@ -252,10 +262,10 @@ export default function ProjectDetail() {
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
           >
-            <h2 className="mono text-sm text-muted-foreground uppercase mb-6 tracking-widest">PROJECT_BRIEF</h2>
-            <div className="prose prose-blue max-w-none">
+            <div className="mb-6"><SectionLabel>CONCEPT</SectionLabel></div>
+            <div className="prose prose-zinc max-w-none">
               {project.description
-                ? <p className="whitespace-pre-wrap">{project.description}</p>
+                ? <p className="whitespace-pre-wrap text-foreground leading-relaxed">{project.description}</p>
                 : <p className="italic text-muted-foreground">No detailed description available.</p>
               }
             </div>
@@ -269,7 +279,7 @@ export default function ProjectDetail() {
             custom={1}
             viewport={{ once: true, margin: "-80px" }}
           >
-            <h2 className="mono text-sm text-muted-foreground uppercase mb-6 tracking-widest">METHODOLOGY</h2>
+            <div className="mb-6"><SectionLabel>METHODOLOGY</SectionLabel></div>
             {project.methodologySteps && project.methodologySteps.length > 0 ? (
               <div className="space-y-8 relative before:absolute before:inset-0 before:ml-[11px] before:h-full before:w-0.5 before:bg-border">
                 {project.methodologySteps.map((step, i) => (
@@ -282,12 +292,12 @@ export default function ProjectDetail() {
                     custom={i * 0.5}
                     viewport={{ once: true }}
                   >
-                    <div className="absolute left-0 w-6 h-6 bg-background border border-border rounded-full flex items-center justify-center mono text-[10px] z-10 font-bold text-primary">
+                    <div className="absolute left-0 w-6 h-6 bg-background border border-primary rounded-full flex items-center justify-center mono text-[10px] z-10 font-bold text-primary">
                       {i + 1}
                     </div>
                     <div className="pl-10">
                       <h3 className="font-bold text-primary uppercase text-sm mb-2">{step.title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+                      <p className="text-sm text-foreground leading-relaxed">{step.description}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -298,25 +308,7 @@ export default function ProjectDetail() {
           </motion.div>
         </div>
 
-        {/* OUTCOMES */}
-        {p?.outcomes && (
-          <motion.div
-            className="border-b border-border"
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-          >
-            <div className="p-4 border-b border-border bg-muted/30">
-              <h2 className="mono text-sm text-primary uppercase font-bold tracking-widest">OUTCOMES_&_RESULTS</h2>
-            </div>
-            <div className="p-8 lg:p-12 max-w-3xl">
-              <p className="whitespace-pre-wrap text-foreground leading-relaxed">{p.outcomes}</p>
-            </div>
-          </motion.div>
-        )}
-
-        {/* ── ARCHITECTURAL PLANS ── */}
+        {/* 6. TECHNICAL DRAWINGS — plan viewer, maximum width */}
         {p?.plans && p.plans.length > 0 && (
           <motion.section
             className="border-b border-border"
@@ -325,13 +317,12 @@ export default function ProjectDetail() {
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
           >
-            {/* Section header — blueprint styled */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-primary text-white">
               <div className="flex items-center gap-3">
                 <div className="grid grid-cols-2 gap-0.5 opacity-60">
                   {[...Array(4)].map((_, i) => <div key={i} className="w-1.5 h-1.5 bg-white" />)}
                 </div>
-                <h2 className="mono text-sm font-bold uppercase tracking-widest">ARCHITECTURAL_DRAWINGS</h2>
+                <h2 className="mono text-sm font-bold uppercase tracking-widest">TECHNICAL_DRAWINGS</h2>
               </div>
               <span className="mono text-[10px] opacity-60 uppercase">{p.plans.length} SHEET{p.plans.length !== 1 ? "S" : ""}</span>
             </div>
@@ -344,17 +335,17 @@ export default function ProjectDetail() {
           </motion.section>
         )}
 
-        {/* PHOTO GALLERY */}
+        {/* 7. RENDERS & OUTCOMES — gallery (final photography) */}
         {project.galleryImages && project.galleryImages.length > 0 && (
           <motion.div
-            className="flex-1"
+            className="border-b border-border"
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
           >
-            <div className="p-4 border-b border-border bg-muted/30">
-              <h2 className="mono text-sm text-primary uppercase font-bold tracking-widest">VISUAL_DOCUMENTS</h2>
+            <div className="p-4 border-b border-border bg-muted/30 flex items-center gap-3">
+              <SectionLabel>RENDERS_&_OUTCOMES</SectionLabel>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-x divide-border">
               {project.galleryImages.map((img, i) => (
@@ -376,6 +367,25 @@ export default function ProjectDetail() {
             </div>
           </motion.div>
         )}
+
+        {/* 8. OUTCOMES text (if present, after imagery) */}
+        {p?.outcomes && (
+          <motion.div
+            className="border-b border-border"
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+          >
+            <div className="p-4 border-b border-border bg-muted/30 flex items-center gap-3">
+              <SectionLabel>OUTCOMES_&_RESULTS</SectionLabel>
+            </div>
+            <div className="p-8 lg:p-12 max-w-3xl">
+              <p className="whitespace-pre-wrap text-foreground leading-relaxed">{p.outcomes}</p>
+            </div>
+          </motion.div>
+        )}
+
       </main>
 
       <Footer />

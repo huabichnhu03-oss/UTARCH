@@ -13,7 +13,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border w-full">
       <div className="flex h-14 items-center px-4 max-w-screen-2xl mx-auto">
-        <Link href="/" className="font-bold tracking-tight text-primary uppercase text-lg shrink-0 hover:text-accent transition-colors">
+        <Link href="/" className="font-bold tracking-tight text-primary uppercase text-lg shrink-0 hover:opacity-70 transition-opacity">
           {settings?.ownerName || "UYEN TON"}
         </Link>
         <div className="flex flex-1 items-center justify-end">
@@ -27,7 +27,7 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={`text-sm font-medium transition-colors border-l border-border pl-6 ml-6 mono uppercase tracking-widest
-                    ${active ? "text-accent" : "hover:text-accent text-foreground"}`}
+                    ${active ? "text-primary" : "hover:text-primary text-foreground"}`}
                 >
                   {link.label}
                 </Link>

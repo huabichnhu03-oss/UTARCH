@@ -14,12 +14,12 @@ import { Plus, Trash2, Loader2 } from "lucide-react";
 import { Uploader } from "@/components/ui/uploader";
 
 const PRESET_COLORS = [
-  { label: "Blueprint Blue", primary: "#0033A0", accent: "#FF4A22" },
-  { label: "Crimson", primary: "#C0001A", accent: "#FF6B00" },
+  { label: "Crimson Red", primary: "#C0392B", accent: "#2D2D2D" },
+  { label: "Cobalt", primary: "#1B3F8B", accent: "#E84B3D" },
   { label: "Forest", primary: "#1A4D2E", accent: "#F5A623" },
   { label: "Midnight", primary: "#1A1A2E", accent: "#E94560" },
-  { label: "Slate", primary: "#2C3E50", accent: "#E67E22" },
-  { label: "Ink", primary: "#0D0D0D", accent: "#FF4A22" },
+  { label: "Slate", primary: "#2C3E50", accent: "#C0392B" },
+  { label: "Ink", primary: "#0D0D0D", accent: "#2D2D2D" },
 ];
 
 export default function AdminSettings() {
@@ -43,8 +43,8 @@ export default function AdminSettings() {
       phone: "",
       linkedin: "",
       archiveDateRange: "",
-      primaryColor: "#0033A0",
-      accentColor: "#FF4A22",
+      primaryColor: "#C0392B",
+      accentColor: "#2D2D2D",
       adminPassword: ""
     }
   });
@@ -69,8 +69,8 @@ export default function AdminSettings() {
         phone: settings.phone,
         linkedin: settings.linkedin,
         archiveDateRange: settings.archiveDateRange,
-        primaryColor: (settings as any).primaryColor || "#0033A0",
-        accentColor: (settings as any).accentColor || "#FF4A22",
+        primaryColor: (settings as any).primaryColor || "#C0392B",
+        accentColor: (settings as any).accentColor || "#2D2D2D",
         adminPassword: ""
       });
     }
@@ -125,7 +125,7 @@ export default function AdminSettings() {
                           <div className="flex gap-2 items-center">
                             <input
                               type="color"
-                              value={field.value as string || "#0033A0"}
+                              value={field.value as string || "#C0392B"}
                               onChange={(e) => field.onChange(e.target.value)}
                               className="w-10 h-10 border border-border cursor-pointer rounded-none bg-transparent p-0.5"
                             />
@@ -133,7 +133,7 @@ export default function AdminSettings() {
                               className="rounded-none font-mono text-sm"
                               value={field.value as string || ""}
                               onChange={(e) => field.onChange(e.target.value)}
-                              placeholder="#0033A0"
+                              placeholder="#C0392B"
                             />
                           </div>
                         </FormControl>
@@ -147,7 +147,7 @@ export default function AdminSettings() {
                           <div className="flex gap-2 items-center">
                             <input
                               type="color"
-                              value={field.value as string || "#FF4A22"}
+                              value={field.value as string || "#2D2D2D"}
                               onChange={(e) => field.onChange(e.target.value)}
                               className="w-10 h-10 border border-border cursor-pointer rounded-none bg-transparent p-0.5"
                             />
@@ -155,7 +155,7 @@ export default function AdminSettings() {
                               className="rounded-none font-mono text-sm"
                               value={field.value as string || ""}
                               onChange={(e) => field.onChange(e.target.value)}
-                              placeholder="#FF4A22"
+                              placeholder="#2D2D2D"
                             />
                           </div>
                         </FormControl>

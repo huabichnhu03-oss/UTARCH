@@ -73,7 +73,7 @@ export default function PostDetail() {
             )}
           </header>
 
-          <div className="prose prose-blue prose-lg max-w-none prose-headings:text-primary prose-p:text-foreground prose-p:leading-relaxed whitespace-pre-wrap">
+          <div className="prose prose-zinc prose-lg max-w-none prose-headings:text-primary prose-p:text-foreground prose-p:leading-relaxed whitespace-pre-wrap">
             {post.content}
           </div>
         </article>

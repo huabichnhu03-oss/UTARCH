@@ -37,7 +37,7 @@ export default function Home() {
               {settings?.title || "ARCHITECTURAL TECHNOLOGIST"}
             </motion.h1>
             <motion.p
-              className="mt-6 text-xl text-primary font-medium max-w-md"
+              className="mt-6 text-xl text-foreground font-medium max-w-md"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
@@ -88,7 +88,7 @@ export default function Home() {
             viewport={{ once: true, margin: "-80px" }}
           >
             <h2 className="mono text-sm text-muted-foreground uppercase mb-6 tracking-widest">{settings?.aboutHeading || "ABOUT_ME"}</h2>
-            <div className="prose prose-blue prose-p:text-foreground prose-p:leading-relaxed max-w-none">
+            <div className="prose prose-zinc prose-p:text-foreground prose-p:leading-relaxed max-w-none">
               <p>{settings?.aboutBody || "I specialize in transforming architectural concepts into precise, actionable technical drawings."}</p>
             </div>
           </motion.div>
@@ -96,7 +96,7 @@ export default function Home() {
             {(skills.length > 0 ? skills : [{ id: -1, name: "AUTOCAD", sortOrder: 0 }, { id: -2, name: "REVIT", sortOrder: 1 }, { id: -3, name: "SKETCHUP", sortOrder: 2 }, { id: -4, name: "LUMION", sortOrder: 3 }]).map((skill, i) => (
               <motion.div
                 key={skill.id}
-                className="p-6 flex items-center justify-center text-center group hover:bg-accent hover:text-white transition-colors cursor-default border-t border-l border-border"
+                className="p-6 flex items-center justify-center text-center group hover:bg-primary hover:text-white transition-colors cursor-default border-t border-l border-border"
                 variants={fadeUp}
                 initial="hidden"
                 whileInView="visible"
@@ -139,16 +139,17 @@ export default function Home() {
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30 mono text-xs">NO_IMG</div>
                     )}
-                    <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors" />
+                    <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/15 transition-colors" />
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
                   </div>
-                  <div className="p-5 flex-1 flex flex-col bg-background group-hover:bg-accent/5 transition-colors">
+                  <div className="p-5 flex-1 flex flex-col bg-background group-hover:bg-primary/5 transition-colors">
                     <div className="mono text-[10px] text-muted-foreground mb-2 flex justify-between">
                       <span>{project.role}</span>
                       <span>{new Date(project.createdAt).getFullYear()}</span>
                     </div>
-                    <h3 className="font-bold text-lg leading-tight mb-1 group-hover:text-accent transition-colors">{project.title}</h3>
+                    <h3 className="font-bold text-lg leading-tight mb-1 group-hover:text-primary transition-colors">{project.title}</h3>
                     <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{project.subtitle}</p>
-                    <div className="mt-auto flex items-center text-primary group-hover:text-accent font-medium text-sm transition-colors">
+                    <div className="mt-auto flex items-center text-primary font-medium text-sm">
                       <span className="mono uppercase tracking-wider text-[11px]">VIEW_DETAILS</span>
                       <MoveRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </div>

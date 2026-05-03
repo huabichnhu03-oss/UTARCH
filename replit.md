@@ -58,6 +58,6 @@ A full-stack portfolio website for Uyen Ton, Architectural Technologist. Feature
 
 ## Design
 
-Blueprint grid aesthetic: deep structural blue (#0033A0), clean white, terracotta accent (#FF4A22), 1px solid border system, Space Mono for labels, Inter for body text.
+Crimson Red theme: signature red (#C0392B) as primary, warm charcoal (#2D2D2D) as accent, clean white background, 1px solid border system, Space Mono for technical labels, Inter for body text. All colors flow through CSS variables (`--c-blue` for primary, `--c-accent` for accent) and are overridable at runtime via the admin Settings panel. The 3D BuildingModel uses a matching red material palette.
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.

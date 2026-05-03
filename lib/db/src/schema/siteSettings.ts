@@ -16,8 +16,8 @@ export const siteSettingsTable = pgTable("site_settings", {
   phone: text("phone").notNull().default("647-713-4229"),
   linkedin: text("linkedin").notNull().default("https://www.linkedin.com/in/uyentonarch/"),
   archiveDateRange: text("archive_date_range").notNull().default("2019 — Present"),
-  primaryColor: text("primary_color").notNull().default("#0033A0"),
-  accentColor: text("accent_color").notNull().default("#FF4A22"),
+  primaryColor: text("primary_color").notNull().default("#C0392B"),
+  accentColor: text("accent_color").notNull().default("#2D2D2D"),
   adminPasswordHash: text("admin_password_hash"),
 });
 

@@ -28,8 +28,8 @@ function mapSettings(row: typeof siteSettingsTable.$inferSelect) {
     phone: row.phone,
     linkedin: row.linkedin,
     archiveDateRange: row.archiveDateRange,
-    primaryColor: row.primaryColor ?? "#0033A0",
-    accentColor: row.accentColor ?? "#FF4A22",
+    primaryColor: row.primaryColor ?? "#C0392B",
+    accentColor: row.accentColor ?? "#2D2D2D",
     adminPasswordHash: null,
   };
 }
