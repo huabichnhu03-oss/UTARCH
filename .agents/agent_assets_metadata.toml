@@ -6,3 +6,15 @@ id = "VyoS9eEDz1cjn-RUHgBKB"
 uri = "file://portfolio_backup.tar.gz"
 type = "unspecified"
 title = "Portfolio Database Backup"
+
+[[outputs]]
+id = "TvAZzgVx-XUHbtaeaxazA"
+uri = "file://uyen-portfolio.tar.gz"
+type = "unspecified"
+title = "Complete Project Source Code"
+
+[[outputs]]
+id = "7eu1EXbhng-U7DGo99Z4O"
+uri = "file://DEPLOYMENT.md"
+type = "text"
+title = "Free Deployment Guide"

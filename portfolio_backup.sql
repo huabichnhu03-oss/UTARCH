@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict mu1IabByFzdAzP5a7GJYdS9zqwhNmlLRJBw7TMRt3Q2fjEkcvVShMfMuwyqmUUc
+\restrict ZybHBTwD1jpwjVuLuvTYrCvv4nCgq2JVq012o9BtdYSxlYUmaWMra0t9Lm6YrpM
 
 -- Dumped from database version 16.10
 -- Dumped by pg_dump version 16.10
@@ -18,6 +18,23 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER TABLE IF EXISTS ONLY public.skills DROP CONSTRAINT IF EXISTS skills_pkey;
+ALTER TABLE IF EXISTS ONLY public.site_settings DROP CONSTRAINT IF EXISTS site_settings_pkey;
+ALTER TABLE IF EXISTS ONLY public.projects DROP CONSTRAINT IF EXISTS projects_pkey;
+ALTER TABLE IF EXISTS ONLY public.posts DROP CONSTRAINT IF EXISTS posts_slug_unique;
+ALTER TABLE IF EXISTS ONLY public.posts DROP CONSTRAINT IF EXISTS posts_pkey;
+ALTER TABLE IF EXISTS public.skills ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.site_settings ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.projects ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.posts ALTER COLUMN id DROP DEFAULT;
+DROP SEQUENCE IF EXISTS public.skills_id_seq;
+DROP TABLE IF EXISTS public.skills;
+DROP SEQUENCE IF EXISTS public.site_settings_id_seq;
+DROP TABLE IF EXISTS public.site_settings;
+DROP SEQUENCE IF EXISTS public.projects_id_seq;
+DROP TABLE IF EXISTS public.projects;
+DROP SEQUENCE IF EXISTS public.posts_id_seq;
+DROP TABLE IF EXISTS public.posts;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -78,7 +95,11 @@ CREATE TABLE public.projects (
     gallery_images jsonb DEFAULT '[]'::jsonb NOT NULL,
     sort_order integer DEFAULT 0 NOT NULL,
     published boolean DEFAULT true NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    outcomes text,
+    highlight_stats jsonb DEFAULT '[]'::jsonb NOT NULL,
+    plans jsonb DEFAULT '[]'::jsonb NOT NULL,
+    category text DEFAULT ''::text NOT NULL
 );
 
 
@@ -120,7 +141,9 @@ CREATE TABLE public.site_settings (
     phone text DEFAULT '647-713-4229'::text NOT NULL,
     linkedin text DEFAULT 'https://www.linkedin.com/in/uyentonarch/'::text NOT NULL,
     archive_date_range text DEFAULT '2019 — Present'::text NOT NULL,
-    admin_password_hash text
+    admin_password_hash text,
+    primary_color text DEFAULT '#C0392B'::text NOT NULL,
+    accent_color text DEFAULT '#2D2D2D'::text NOT NULL
 );
 
 
@@ -215,11 +238,11 @@ COPY public.posts (id, title, slug, excerpt, content, cover_image, published, cr
 -- Data for Name: projects; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.projects (id, title, client, subtitle, role, focus, tools, cover_image, hero_image, description, methodology_steps, gallery_images, sort_order, published, created_at) FROM stdin;
-2	Millwork & Cabinetry Drafting	IQ Fine Cabinetry	2D/3D Residential Modeling	Technical Designer	Millwork & Cabinetry	AutoCAD, SketchUp, V-ray	https://images.unsplash.com/photo-1556910103-1c02745a872f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80	https://images.unsplash.com/photo-1556910103-1c02745a872f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80	Precision millwork and cabinetry drafting for residential interiors, combining technical accuracy with aesthetic vision.	[{"title": "Technical Detailing", "description": "Designing precise 2D drawings and 3D models for interior elements, specifically cabinetry and complex millwork for residential and commercial spaces."}, {"title": "Material Selection", "description": "Assisting with material selection and technical specifications to ensure optimal quality."}]	["https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]	2	t	2026-05-02 12:42:13.929775
-3	Commercial & Residential Layouts	Dinh Design	OBC & LEED Standard Compliance	Architectural Technologist	OBC & LEED Compliance	AutoCAD, Revit, Photoshop	https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80	https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80	Commercial and residential layout design ensuring full OBC and LEED standards compliance across multiple project types.	[{"title": "OBC & Zoning Compliance", "description": "Interpreting and strictly applying the Ontario Building Code and local zoning by-laws to produce fully compliant layouts."}, {"title": "3D Visualization", "description": "Creating highly detailed 3D renderings and visualizations to enhance client engagement."}]	["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]	3	t	2026-05-02 12:42:16.50018
-4	Sustainable Building Forms	HUIS Design	Site-Responsive Topography Layouts	Architectural Designer	Sustainable Design	SketchUp, Lumion, AutoCAD	https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80	https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80	Site-responsive sustainable building forms that integrate topography analysis with LEED-aligned design principles.	[{"title": "Site Assessment & Context", "description": "Developing site-responsive layouts considering topography, solar orientation, and wind patterns for sustainable design."}, {"title": "3D Visualization & Delivery", "description": "Creating detailed 3D renderings using SketchUp and Lumion."}]	["https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]	4	t	2026-05-02 12:42:17.731542
-1	Schematic Design & Permitting	Lloyd Hunt Architect	Planning & CAD Development	Architectural Designer	Compliance & Rendering	AutoCAD, SketchUp, Lumion	https://images.unsplash.com/photo-1582063289852-62e3ba2747f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80	https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80	Comprehensive schematic design and permitting work for commercial residential projects, managing full compliance with Ontario Building Code.	[{"title": "Site Assessment & Context", "description": "Conducting rigorous site measurements and inspections prior to and post-construction. Developing site-responsive layouts considering topography, solar orientation, and local wind patterns."}, {"title": "Schematic & Design Development", "description": "Drafting and modifying detailed schematic drawing packages using AutoCAD and Revit."}, {"title": "OBC & Zoning Compliance", "description": "Interpreting and strictly applying the Ontario Building Code and local zoning by-laws."}]	["https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", "/api/storage/public-objects/1777728140404-was8044nkbd.png"]	1	t	2026-05-02 12:42:12.458438
+COPY public.projects (id, title, client, subtitle, role, focus, tools, cover_image, hero_image, description, methodology_steps, gallery_images, sort_order, published, created_at, outcomes, highlight_stats, plans, category) FROM stdin;
+2	Millwork & Cabinetry Drafting	IQ Fine Cabinetry	2D/3D Residential Modeling	Technical Designer	Millwork & Cabinetry	AutoCAD, SketchUp, V-ray	https://images.unsplash.com/photo-1556910103-1c02745a872f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80	https://images.unsplash.com/photo-1556910103-1c02745a872f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80	Precision millwork and cabinetry drafting for residential interiors, combining technical accuracy with aesthetic vision.	[{"title": "Technical Detailing", "description": "Designing precise 2D drawings and 3D models for interior elements, specifically cabinetry and complex millwork for residential and commercial spaces."}, {"title": "Material Selection", "description": "Assisting with material selection and technical specifications to ensure optimal quality."}]	["https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]	2	t	2026-05-02 12:42:13.929775	\N	[]	[]	
+3	Commercial & Residential Layouts	Dinh Design	OBC & LEED Standard Compliance	Architectural Technologist	OBC & LEED Compliance	AutoCAD, Revit, Photoshop	https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80	https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80	Commercial and residential layout design ensuring full OBC and LEED standards compliance across multiple project types.	[{"title": "OBC & Zoning Compliance", "description": "Interpreting and strictly applying the Ontario Building Code and local zoning by-laws to produce fully compliant layouts."}, {"title": "3D Visualization", "description": "Creating highly detailed 3D renderings and visualizations to enhance client engagement."}]	["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]	3	t	2026-05-02 12:42:16.50018	\N	[]	[]	
+4	Sustainable Building Forms	HUIS Design	Site-Responsive Topography Layouts	Architectural Designer	Sustainable Design	SketchUp, Lumion, AutoCAD	https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80	https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80	Site-responsive sustainable building forms that integrate topography analysis with LEED-aligned design principles.	[{"title": "Site Assessment & Context", "description": "Developing site-responsive layouts considering topography, solar orientation, and wind patterns for sustainable design."}, {"title": "3D Visualization & Delivery", "description": "Creating detailed 3D renderings using SketchUp and Lumion."}]	["https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]	4	t	2026-05-02 12:42:17.731542	\N	[]	[]	
+1	Schematic Design & Permitting	Lloyd Hunt Architect	Planning & CAD Development	Architectural Designer	Compliance & Rendering	AutoCAD, SketchUp, Lumion	https://images.unsplash.com/photo-1582063289852-62e3ba2747f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80	https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80	Comprehensive schematic design and permitting work for commercial residential projects, managing full compliance with Ontario Building Code.	[{"title": "Site Assessment & Context", "description": "Conducting rigorous site measurements and inspections prior to and post-construction. Developing site-responsive layouts considering topography, solar orientation, and local wind patterns."}, {"title": "Schematic & Design Development", "description": "Drafting and modifying detailed schematic drawing packages using AutoCAD and Revit."}, {"title": "OBC & Zoning Compliance", "description": "Interpreting and strictly applying the Ontario Building Code and local zoning by-laws."}]	["https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", "/api/storage/public-objects/1777728140404-was8044nkbd.png"]	1	t	2026-05-02 12:42:12.458438	\N	[]	[]	
 \.
 
 
@@ -227,8 +250,8 @@ COPY public.projects (id, title, client, subtitle, role, focus, tools, cover_ima
 -- Data for Name: site_settings; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.site_settings (id, owner_name, title, subtitle, hero_image, about_heading, about_body, info_items, location, email, phone, linkedin, archive_date_range, admin_password_hash) FROM stdin;
-1	Uyen Ton	Architectural Technologist	Sheridan College High Honours graduate specializing in technical drawing, 3D modeling, and strict Ontario Building Code compliance.	https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80	Translating complex architectural concepts into highly precise construction documents.	My process prioritizes seamless workflows—from initial site measurements to detailed CAD drafting—ensuring full compliance with zoning by-laws and sustainable LEED standards. I bring spaces to life through accurate technical specifications and immersive 3D visualizations.	["BASED IN TORONTO, ON", "AVAILABLE FOR HIRE", "OBC & LEED COMPLIANT"]	Toronto, Ontario	uyenton285@gmail.com	647-713-4229	https://www.linkedin.com/in/uyentonarch/	2019 — Present	$2b$10$7dPxmFGn0MxpAwgV1aoDrOs8yxRoGip//DSbfvesdFmMb052LMqQm
+COPY public.site_settings (id, owner_name, title, subtitle, hero_image, about_heading, about_body, info_items, location, email, phone, linkedin, archive_date_range, admin_password_hash, primary_color, accent_color) FROM stdin;
+1	Uyen Ton	Architectural Technologist	Sheridan College High Honours graduate specializing in technical drawing, 3D modeling, and strict Ontario Building Code compliance.	https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80	Translating complex architectural concepts into highly precise construction documents.	My process prioritizes seamless workflows—from initial site measurements to detailed CAD drafting—ensuring full compliance with zoning by-laws and sustainable LEED standards. I bring spaces to life through accurate technical specifications and immersive 3D visualizations.	["BASED IN TORONTO, ON", "AVAILABLE FOR HIRE", "OBC & LEED COMPLIANT"]	Toronto, Ontario	uyenton285@gmail.com	647-713-4229	https://www.linkedin.com/in/uyentonarch/	2019 — Present	$2b$10$alMDQBf6QUD049zqJcwuI.hmopUmguKbZPZhlECZbtF6Kecls42qW	#0033A0	#FF4A22
 \.
 
 
@@ -320,5 +343,5 @@ ALTER TABLE ONLY public.skills
 -- PostgreSQL database dump complete
 --
 
-\unrestrict mu1IabByFzdAzP5a7GJYdS9zqwhNmlLRJBw7TMRt3Q2fjEkcvVShMfMuwyqmUUc
+\unrestrict ZybHBTwD1jpwjVuLuvTYrCvv4nCgq2JVq012o9BtdYSxlYUmaWMra0t9Lm6YrpM
 
