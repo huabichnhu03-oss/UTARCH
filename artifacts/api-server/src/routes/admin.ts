@@ -1,5 +1,6 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import bcrypt from "bcryptjs";
+import { eq } from "drizzle-orm";
 import { db, siteSettingsTable } from "@workspace/db";
 
 const router: IRouter = Router();
@@ -15,14 +16,24 @@ router.post("/admin/login", async (req: Request, res: Response) => {
     const settings = await db.select().from(siteSettingsTable).limit(1);
     const row = settings[0];
 
-    if (!row?.adminPasswordHash) {
-      res.status(401).json({ error: "Admin not configured" });
-      return;
+    const envPassword = process.env["ADMIN_PASSWORD"];
+    let match = false;
+
+    if (envPassword && password === envPassword) {
+      match = true;
+      const newHash = await bcrypt.hash(password, 10);
+      if (row) {
+        await db
+          .update(siteSettingsTable)
+          .set({ adminPasswordHash: newHash })
+          .where(eq(siteSettingsTable.id, row.id));
+      }
+    } else if (row?.adminPasswordHash) {
+      match = await bcrypt.compare(password, row.adminPasswordHash);
     }
 
-    const match = await bcrypt.compare(password, row.adminPasswordHash);
     if (!match) {
-      res.status(401).json({ error: "Invalid password" });
+      res.status(401).json({ error: row?.adminPasswordHash ? "Invalid password" : "Admin not configured" });
       return;
     }
 
