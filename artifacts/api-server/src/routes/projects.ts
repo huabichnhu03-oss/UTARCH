@@ -29,6 +29,7 @@ function mapProject(p: typeof projectsTable.$inferSelect) {
     highlightStats: (p.highlightStats as { label: string; value: string }[]) ?? [],
     methodologySteps: (p.methodologySteps as { title: string; description: string }[]) ?? [],
     galleryImages: (p.galleryImages as string[]) ?? [],
+    plans: (p.plans as { title: string; url: string }[]) ?? [],
     sortOrder: p.sortOrder,
     published: p.published,
     createdAt: p.createdAt.toISOString(),
@@ -76,8 +77,11 @@ router.post("/projects", requireAdmin, async (req: Request, res: Response) => {
   const body = req.body as {
     title: string; client: string; subtitle: string; role: string; focus: string; tools: string;
     coverImage?: string | null; heroImage?: string | null; description?: string | null;
-    outcomes?: string | null; highlightStats?: { label: string; value: string }[];
-    methodologySteps?: { title: string; description: string }[]; galleryImages?: string[];
+    outcomes?: string | null;
+    highlightStats?: { label: string; value: string }[];
+    methodologySteps?: { title: string; description: string }[];
+    galleryImages?: string[];
+    plans?: { title: string; url: string }[];
     sortOrder?: number; published?: boolean;
   };
   try {
@@ -95,6 +99,7 @@ router.post("/projects", requireAdmin, async (req: Request, res: Response) => {
       highlightStats: body.highlightStats ?? [],
       methodologySteps: body.methodologySteps ?? [],
       galleryImages: body.galleryImages ?? [],
+      plans: body.plans ?? [],
       sortOrder: body.sortOrder ?? 0,
       published: body.published ?? true,
     }).returning();
@@ -111,8 +116,11 @@ router.put("/projects/:id", requireAdmin, async (req: Request, res: Response) =>
   const body = req.body as Partial<{
     title: string; client: string; subtitle: string; role: string; focus: string; tools: string;
     coverImage: string | null; heroImage: string | null; description: string | null;
-    outcomes: string | null; highlightStats: { label: string; value: string }[];
-    methodologySteps: { title: string; description: string }[]; galleryImages: string[];
+    outcomes: string | null;
+    highlightStats: { label: string; value: string }[];
+    methodologySteps: { title: string; description: string }[];
+    galleryImages: string[];
+    plans: { title: string; url: string }[];
     sortOrder: number; published: boolean;
   }>;
   try {

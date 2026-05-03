@@ -17,6 +17,7 @@ export const projectsTable = pgTable("projects", {
   highlightStats: jsonb("highlight_stats").notNull().$type<{ label: string; value: string }[]>().default([]),
   methodologySteps: jsonb("methodology_steps").notNull().$type<{ title: string; description: string }[]>().default([]),
   galleryImages: jsonb("gallery_images").notNull().$type<string[]>().default([]),
+  plans: jsonb("plans").notNull().$type<{ title: string; url: string }[]>().default([]),
   sortOrder: integer("sort_order").notNull().default(0),
   published: boolean("published").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
