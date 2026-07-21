@@ -20,7 +20,12 @@ export function PlanUploader({ onUpload }: PlanUploaderProps) {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await fetch("/api/uploads", { method: "POST", body: formData });
+      const apiBase = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, "") || "";
+      const res = await fetch(`${apiBase}/api/uploads`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
       if (!res.ok) throw new Error("Upload failed");
       const data = await res.json() as { url: string };
       onUpload(data.url, file.name.replace(/\.[^/.]+$/, ""));

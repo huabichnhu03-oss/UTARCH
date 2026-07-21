@@ -66,8 +66,17 @@ router.get("/projects/:id", async (req: Request, res: Response) => {
   if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
   try {
     const rows = await db.select().from(projectsTable).where(eq(projectsTable.id, id)).limit(1);
-    if (!rows[0]) { res.status(404).json({ error: "Not found" }); return; }
-    res.json(mapProject(rows[0]));
+    const project = rows[0];
+    if (!project) { res.status(404).json({ error: "Not found" }); return; }
+
+    // Hide unpublished drafts from the public; admins can still fetch them
+    const isAdmin = (req.session as unknown as Record<string, unknown>)["isAdmin"] === true;
+    if (!project.published && !isAdmin) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+
+    res.json(mapProject(project));
   } catch (err) {
     req.log.error({ err }, "Error getting project");
     res.status(500).json({ error: "Internal server error" });
@@ -103,7 +112,7 @@ router.post("/projects", requireAdmin, async (req: Request, res: Response) => {
       galleryImages: body.galleryImages ?? [],
       plans: body.plans ?? [],
       sortOrder: body.sortOrder ?? 0,
-      published: body.published ?? true,
+      published: body.published ?? false,
     }).returning();
     res.status(201).json(mapProject(inserted[0]!));
   } catch (err) {

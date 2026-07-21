@@ -63,7 +63,8 @@ If you want to keep your current projects/posts/settings:
    |---|---|
    | `DATABASE_URL` | Your Neon connection string from Step 2 |
    | `SESSION_SECRET` | Any long random string (e.g. mash your keyboard) |
-   | `ADMIN_PASSWORD` | The password you want to log into admin with |
+   | `ADMIN_PASSWORD` | Bootstrap password used only when no admin hash exists yet |
+   | `CORS_ORIGIN` | Your Vercel URL (e.g. `https://uyen-portfolio.vercel.app`) |
    | `NODE_ENV` | `production` |
    | `PORT` | `8080` |
 6. Click **Create Web Service**. First build takes ~5 minutes.
@@ -86,7 +87,7 @@ After the API is live, you need to create the tables. The easiest way:
    - **Framework Preset:** Vite
    - **Root Directory:** `artifacts/portfolio`
    - **Build Command:** `cd ../.. && pnpm install && pnpm --filter @workspace/portfolio build`
-   - **Output Directory:** `dist`
+   - **Output Directory:** `dist/public`
    - **Install Command:** leave blank
 4. Add **Environment Variables**:
    | Key | Value |
@@ -100,28 +101,19 @@ After the API is live, you need to create the tables. The easiest way:
 
 ## Step 5 — Connect frontend to backend
 
-Edit one file in your repo before deploying, or after (then push to GitHub — Vercel auto-redeploys):
+Set these environment variables (no manual code edits required after the bugfix commit):
 
-**File:** `lib/api-client-react/src/custom-fetch.ts`
+**Vercel (frontend):**
+| Key | Value |
+|---|---|
+| `VITE_API_URL` | Render API URL, e.g. `https://uyen-portfolio-api.onrender.com` |
 
-Find the line that calls `fetch(...)` and change the base URL to use the env variable:
-```ts
-const API_BASE = import.meta.env.VITE_API_URL || "";
-// then prepend API_BASE to the request URL
-const response = await fetch(`${API_BASE}${url}`, { ...options, credentials: "include" });
-```
+**Render (API):**
+| Key | Value |
+|---|---|
+| `CORS_ORIGIN` | Your Vercel URL, e.g. `https://uyen-portfolio.vercel.app` |
 
-Also update the backend CORS to allow your Vercel domain. In `artifacts/api-server/src/app.ts`, change:
-```ts
-app.use(cors({ origin: true, credentials: true }));
-```
-to:
-```ts
-app.use(cors({
-  origin: ["https://your-vercel-domain.vercel.app"],
-  credentials: true,
-}));
-```
+The frontend calls `setBaseUrl(VITE_API_URL)` on boot. When `CORS_ORIGIN` is set, the API uses `SameSite=None` cookies so admin login works across domains.
 
 Commit & push — both Vercel and Render will auto-redeploy.
 

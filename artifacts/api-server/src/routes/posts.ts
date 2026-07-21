@@ -52,8 +52,17 @@ router.get("/posts/:id", async (req: Request, res: Response) => {
   if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
   try {
     const rows = await db.select().from(postsTable).where(eq(postsTable.id, id)).limit(1);
-    if (!rows[0]) { res.status(404).json({ error: "Not found" }); return; }
-    res.json(mapPost(rows[0]));
+    const post = rows[0];
+    if (!post) { res.status(404).json({ error: "Not found" }); return; }
+
+    // Hide unpublished drafts from the public; admins can still fetch them
+    const isAdmin = (req.session as unknown as Record<string, unknown>)["isAdmin"] === true;
+    if (!post.published && !isAdmin) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+
+    res.json(mapPost(post));
   } catch (err) {
     req.log.error({ err }, "Error getting post");
     res.status(500).json({ error: "Internal server error" });

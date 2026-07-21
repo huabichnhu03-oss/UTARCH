@@ -20,9 +20,11 @@ export function Uploader({ onUploadComplete }: { onUploadComplete?: (url: string
       const formData = new FormData();
       formData.append("file", file);
       
-      const res = await fetch("/api/uploads", {
+      const apiBase = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, "") || "";
+      const res = await fetch(`${apiBase}/api/uploads`, {
         method: "POST",
-        body: formData
+        body: formData,
+        credentials: "include",
       });
       
       if (!res.ok) throw new Error("Upload failed");

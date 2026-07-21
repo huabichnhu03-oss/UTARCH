@@ -19,7 +19,11 @@ router.post("/admin/login", async (req: Request, res: Response) => {
     const envPassword = process.env["ADMIN_PASSWORD"];
     let match = false;
 
-    if (envPassword && password === envPassword) {
+    if (row?.adminPasswordHash) {
+      // Prefer the stored hash so Settings password changes stick.
+      // ADMIN_PASSWORD is only a bootstrap when no hash exists yet.
+      match = await bcrypt.compare(password, row.adminPasswordHash);
+    } else if (envPassword && password === envPassword) {
       match = true;
       const newHash = await bcrypt.hash(password, 10);
       if (row) {
@@ -27,9 +31,9 @@ router.post("/admin/login", async (req: Request, res: Response) => {
           .update(siteSettingsTable)
           .set({ adminPasswordHash: newHash })
           .where(eq(siteSettingsTable.id, row.id));
+      } else {
+        await db.insert(siteSettingsTable).values({ adminPasswordHash: newHash });
       }
-    } else if (row?.adminPasswordHash) {
-      match = await bcrypt.compare(password, row.adminPasswordHash);
     }
 
     if (!match) {

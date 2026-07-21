@@ -40,9 +40,15 @@ router.get("/storage/public-objects/*filePath", async (req: Request, res: Respon
 /**
  * GET /storage/objects/*
  *
- * Serve object entities from PRIVATE_OBJECT_DIR.
+ * Serve object entities from PRIVATE_OBJECT_DIR (admin-only).
  */
 router.get("/storage/objects/*path", async (req: Request, res: Response) => {
+  const isAdmin = (req.session as unknown as Record<string, unknown>)["isAdmin"] === true;
+  if (!isAdmin) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
   try {
     const raw = req.params.path;
     const wildcardPath = Array.isArray(raw) ? raw.join("/") : raw;

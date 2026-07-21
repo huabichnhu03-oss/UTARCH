@@ -48,7 +48,9 @@ function ThemeApplicator() {
   const { data: settings } = useQuery({
     queryKey: ["settings-theme"],
     queryFn: async () => {
-      const res = await fetch("/api/settings", { credentials: "include" });
+      const apiBase = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, "") || "";
+      const res = await fetch(`${apiBase}/api/settings`, { credentials: "include" });
+      if (!res.ok) throw new Error(`Failed to load settings (${res.status})`);
       return res.json() as Promise<{ primaryColor?: string; accentColor?: string }>;
     },
     staleTime: 30_000,
