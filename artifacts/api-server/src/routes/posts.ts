@@ -1,6 +1,7 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { eq, desc } from "drizzle-orm";
 import { db, postsTable } from "@workspace/db";
+import { paramId } from "../lib/params";
 import { requireAdmin, isAdminSession } from "../middlewares/requireAdmin";
 
 const router: IRouter = Router();
@@ -28,6 +29,21 @@ type PostBody = {
   published?: boolean;
 };
 
+function pickPostFields(
+  body: PostBody,
+  mode: "create",
+): {
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string;
+  coverImage: string | null;
+  published: boolean;
+} | null;
+function pickPostFields(
+  body: PostBody,
+  mode: "update",
+): Partial<typeof postsTable.$inferInsert> | null;
 function pickPostFields(body: PostBody, mode: "create" | "update") {
   if (mode === "create") {
     if (!body.title || !body.slug || !body.content) return null;
@@ -76,7 +92,7 @@ router.get("/posts/all", requireAdmin, async (req: Request, res: Response) => {
 });
 
 router.get("/posts/:id", async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id ?? "");
+  const id = paramId(req.params.id);
   if (isNaN(id)) {
     res.status(400).json({ error: "Invalid id" });
     return;
@@ -115,7 +131,7 @@ router.post("/posts", requireAdmin, async (req: Request, res: Response) => {
 });
 
 router.put("/posts/:id", requireAdmin, async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id ?? "");
+  const id = paramId(req.params.id);
   if (isNaN(id)) {
     res.status(400).json({ error: "Invalid id" });
     return;
@@ -143,7 +159,7 @@ router.put("/posts/:id", requireAdmin, async (req: Request, res: Response) => {
 });
 
 router.delete("/posts/:id", requireAdmin, async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id ?? "");
+  const id = paramId(req.params.id);
   if (isNaN(id)) {
     res.status(400).json({ error: "Invalid id" });
     return;

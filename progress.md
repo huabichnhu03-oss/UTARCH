@@ -28,8 +28,11 @@ Portfolio monorepo (React/Vite + Express + Drizzle/Postgres). Core app is keepab
 - [x] Remove Replit GCS client
 - [x] Document Cloudinary in DEPLOYMENT.md / README
 - [x] Set Cloudinary + other secrets (local `.env`)
-- [x] Neon schema push (`drizzle-kit push`)
-- [ ] Re-upload old Replit-hosted images after cutover
+- [x] Deploy Neon schema push (`drizzle-kit push`)
+- [x] Push to GitHub (`huabichnhu03-oss/UTARCH`)
+- [x] Vercel frontend live — https://utarch.vercel.app
+- [ ] Render API deploy (blueprint ready; needs dashboard login)
+- [ ] Set `CORS_ORIGIN=https://utarch.vercel.app` on Render
 
 ### P2 — Tidy (task 3)
 

@@ -1,6 +1,7 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { eq, asc } from "drizzle-orm";
 import { db, skillsTable } from "@workspace/db";
+import { paramId } from "../lib/params";
 import { requireAdmin } from "../middlewares/requireAdmin";
 
 const router: IRouter = Router();
@@ -37,7 +38,7 @@ router.post("/skills", requireAdmin, async (req: Request, res: Response) => {
 });
 
 router.put("/skills/:id", requireAdmin, async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id ?? "");
+  const id = paramId(req.params.id);
   if (isNaN(id)) {
     res.status(400).json({ error: "Invalid id" });
     return;
@@ -68,7 +69,7 @@ router.put("/skills/:id", requireAdmin, async (req: Request, res: Response) => {
 });
 
 router.delete("/skills/:id", requireAdmin, async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id ?? "");
+  const id = paramId(req.params.id);
   if (isNaN(id)) {
     res.status(400).json({ error: "Invalid id" });
     return;

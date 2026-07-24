@@ -1,6 +1,7 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { eq, asc } from "drizzle-orm";
 import { db, projectsTable } from "@workspace/db";
+import { paramId } from "../lib/params";
 import { requireAdmin, isAdminSession } from "../middlewares/requireAdmin";
 
 const router: IRouter = Router();
@@ -49,6 +50,32 @@ type ProjectBody = {
   published?: boolean;
 };
 
+function pickProjectFields(
+  body: ProjectBody,
+  mode: "create",
+): {
+  title: string;
+  client: string;
+  subtitle: string;
+  category: string;
+  role: string;
+  focus: string;
+  tools: string;
+  coverImage: string | null;
+  heroImage: string | null;
+  description: string | null;
+  outcomes: string | null;
+  highlightStats: { label: string; value: string }[];
+  methodologySteps: { title: string; description: string }[];
+  galleryImages: string[];
+  plans: { title: string; url: string }[];
+  sortOrder: number;
+  published: boolean;
+} | null;
+function pickProjectFields(
+  body: ProjectBody,
+  mode: "update",
+): Partial<typeof projectsTable.$inferInsert> | null;
 function pickProjectFields(body: ProjectBody, mode: "create" | "update") {
   const data: Partial<typeof projectsTable.$inferInsert> = {};
   if (body.title !== undefined) data.title = body.title;
@@ -122,7 +149,7 @@ router.get("/projects/all", requireAdmin, async (req: Request, res: Response) =>
 });
 
 router.get("/projects/:id", async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id ?? "");
+  const id = paramId(req.params.id);
   if (isNaN(id)) {
     res.status(400).json({ error: "Invalid id" });
     return;
@@ -161,7 +188,7 @@ router.post("/projects", requireAdmin, async (req: Request, res: Response) => {
 });
 
 router.put("/projects/:id", requireAdmin, async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id ?? "");
+  const id = paramId(req.params.id);
   if (isNaN(id)) {
     res.status(400).json({ error: "Invalid id" });
     return;
@@ -189,7 +216,7 @@ router.put("/projects/:id", requireAdmin, async (req: Request, res: Response) =>
 });
 
 router.delete("/projects/:id", requireAdmin, async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id ?? "");
+  const id = paramId(req.params.id);
   if (isNaN(id)) {
     res.status(400).json({ error: "Invalid id" });
     return;
