@@ -1,17 +1,9 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import bcrypt from "bcryptjs";
 import { db, siteSettingsTable } from "@workspace/db";
+import { requireAdmin } from "../middlewares/requireAdmin";
 
 const router: IRouter = Router();
-
-function requireAdmin(req: Request, res: Response, next: () => void) {
-  const isAdmin = (req.session as unknown as Record<string, unknown>)["isAdmin"] === true;
-  if (!isAdmin) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
-  next();
-}
 
 function mapSettings(row: typeof siteSettingsTable.$inferSelect) {
   return {
@@ -30,7 +22,8 @@ function mapSettings(row: typeof siteSettingsTable.$inferSelect) {
     archiveDateRange: row.archiveDateRange,
     primaryColor: row.primaryColor ?? "#C0392B",
     accentColor: row.accentColor ?? "#2D2D2D",
-    adminPasswordHash: null,
+    // Never expose the stored hash over the API
+    adminPasswordHash: null as null,
   };
 }
 
@@ -51,16 +44,26 @@ router.get("/settings", async (req: Request, res: Response) => {
 
 router.put("/settings", requireAdmin, async (req: Request, res: Response) => {
   const body = req.body as Partial<{
-    ownerName: string; title: string; subtitle: string; heroImage: string | null;
-    aboutHeading: string; aboutBody: string; infoItems: string[];
-    location: string; email: string; phone: string; linkedin: string;
-    archiveDateRange: string; primaryColor: string; accentColor: string;
+    ownerName: string;
+    title: string;
+    subtitle: string;
+    heroImage: string | null;
+    aboutHeading: string;
+    aboutBody: string;
+    infoItems: string[];
+    location: string;
+    email: string;
+    phone: string;
+    linkedin: string;
+    archiveDateRange: string;
+    primaryColor: string;
+    accentColor: string;
     adminPassword: string | null;
   }>;
 
   try {
     const rows = await db.select().from(siteSettingsTable).limit(1);
-    
+
     const updateData: Partial<typeof siteSettingsTable.$inferInsert> = {};
     if (body.ownerName !== undefined) updateData.ownerName = body.ownerName;
     if (body.title !== undefined) updateData.title = body.title;
@@ -76,7 +79,12 @@ router.put("/settings", requireAdmin, async (req: Request, res: Response) => {
     if (body.archiveDateRange !== undefined) updateData.archiveDateRange = body.archiveDateRange;
     if (body.primaryColor !== undefined) updateData.primaryColor = body.primaryColor;
     if (body.accentColor !== undefined) updateData.accentColor = body.accentColor;
+
     if (body.adminPassword) {
+      if (body.adminPassword.length < 12) {
+        res.status(400).json({ error: "Admin password must be at least 12 characters" });
+        return;
+      }
       updateData.adminPasswordHash = await bcrypt.hash(body.adminPassword, 10);
     }
 

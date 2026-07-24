@@ -15,7 +15,11 @@ export const siteSettingsSchema = z.object({
   archiveDateRange: z.string().min(1, "Required"),
   primaryColor: z.string().optional(),
   accentColor: z.string().optional(),
-  adminPassword: z.string().nullable().optional(),
+  adminPassword: z
+    .string()
+    .refine((v) => !v || v.length >= 12, "Password must be at least 12 characters")
+    .nullable()
+    .optional(),
 });
 
 export const projectSchema = z.object({
@@ -39,6 +43,10 @@ export const projectSchema = z.object({
     description: z.string().min(1, "Required")
   })).optional(),
   galleryImages: z.array(z.string()).optional(),
+  plans: z.array(z.object({
+    title: z.string().min(1, "Required"),
+    url: z.string().min(1, "Required"),
+  })).optional(),
   sortOrder: z.coerce.number().optional(),
   published: z.boolean().optional()
 });

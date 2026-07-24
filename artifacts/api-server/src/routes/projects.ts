@@ -1,17 +1,9 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { eq, asc } from "drizzle-orm";
 import { db, projectsTable } from "@workspace/db";
+import { requireAdmin, isAdminSession } from "../middlewares/requireAdmin";
 
 const router: IRouter = Router();
-
-function requireAdmin(req: Request, res: Response, next: () => void) {
-  const isAdmin = (req.session as unknown as Record<string, unknown>)["isAdmin"] === true;
-  if (!isAdmin) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
-  next();
-}
 
 function mapProject(p: typeof projectsTable.$inferSelect) {
   return {
@@ -35,6 +27,74 @@ function mapProject(p: typeof projectsTable.$inferSelect) {
     published: p.published,
     createdAt: p.createdAt.toISOString(),
   };
+}
+
+type ProjectBody = {
+  title?: string;
+  client?: string;
+  subtitle?: string;
+  category?: string;
+  role?: string;
+  focus?: string;
+  tools?: string;
+  coverImage?: string | null;
+  heroImage?: string | null;
+  description?: string | null;
+  outcomes?: string | null;
+  highlightStats?: { label: string; value: string }[];
+  methodologySteps?: { title: string; description: string }[];
+  galleryImages?: string[];
+  plans?: { title: string; url: string }[];
+  sortOrder?: number;
+  published?: boolean;
+};
+
+function pickProjectFields(body: ProjectBody, mode: "create" | "update") {
+  const data: Partial<typeof projectsTable.$inferInsert> = {};
+  if (body.title !== undefined) data.title = body.title;
+  if (body.client !== undefined) data.client = body.client;
+  if (body.subtitle !== undefined) data.subtitle = body.subtitle;
+  if (body.category !== undefined) data.category = body.category;
+  if (body.role !== undefined) data.role = body.role;
+  if (body.focus !== undefined) data.focus = body.focus;
+  if (body.tools !== undefined) data.tools = body.tools;
+  if (body.coverImage !== undefined) data.coverImage = body.coverImage;
+  if (body.heroImage !== undefined) data.heroImage = body.heroImage;
+  if (body.description !== undefined) data.description = body.description;
+  if (body.outcomes !== undefined) data.outcomes = body.outcomes;
+  if (body.highlightStats !== undefined) data.highlightStats = body.highlightStats;
+  if (body.methodologySteps !== undefined) data.methodologySteps = body.methodologySteps;
+  if (body.galleryImages !== undefined) data.galleryImages = body.galleryImages;
+  if (body.plans !== undefined) data.plans = body.plans;
+  if (body.sortOrder !== undefined) data.sortOrder = body.sortOrder;
+  if (body.published !== undefined) data.published = body.published;
+
+  if (mode === "create") {
+    if (!body.title || !body.client || !body.subtitle || !body.role || !body.focus || !body.tools) {
+      return null;
+    }
+    return {
+      title: body.title,
+      client: body.client,
+      subtitle: body.subtitle,
+      category: body.category ?? "",
+      role: body.role,
+      focus: body.focus,
+      tools: body.tools,
+      coverImage: body.coverImage ?? null,
+      heroImage: body.heroImage ?? null,
+      description: body.description ?? null,
+      outcomes: body.outcomes ?? null,
+      highlightStats: body.highlightStats ?? [],
+      methodologySteps: body.methodologySteps ?? [],
+      galleryImages: body.galleryImages ?? [],
+      plans: body.plans ?? [],
+      sortOrder: body.sortOrder ?? 0,
+      published: body.published ?? false,
+    };
+  }
+
+  return data;
 }
 
 router.get("/projects", async (req: Request, res: Response) => {
@@ -63,19 +123,21 @@ router.get("/projects/all", requireAdmin, async (req: Request, res: Response) =>
 
 router.get("/projects/:id", async (req: Request, res: Response) => {
   const id = parseInt(req.params.id ?? "");
-  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
   try {
     const rows = await db.select().from(projectsTable).where(eq(projectsTable.id, id)).limit(1);
     const project = rows[0];
-    if (!project) { res.status(404).json({ error: "Not found" }); return; }
-
-    // Hide unpublished drafts from the public; admins can still fetch them
-    const isAdmin = (req.session as unknown as Record<string, unknown>)["isAdmin"] === true;
-    if (!project.published && !isAdmin) {
+    if (!project) {
       res.status(404).json({ error: "Not found" });
       return;
     }
-
+    if (!project.published && !isAdminSession(req)) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
     res.json(mapProject(project));
   } catch (err) {
     req.log.error({ err }, "Error getting project");
@@ -84,36 +146,13 @@ router.get("/projects/:id", async (req: Request, res: Response) => {
 });
 
 router.post("/projects", requireAdmin, async (req: Request, res: Response) => {
-  const body = req.body as {
-    title: string; client: string; subtitle: string; category?: string; role: string; focus: string; tools: string;
-    coverImage?: string | null; heroImage?: string | null; description?: string | null;
-    outcomes?: string | null;
-    highlightStats?: { label: string; value: string }[];
-    methodologySteps?: { title: string; description: string }[];
-    galleryImages?: string[];
-    plans?: { title: string; url: string }[];
-    sortOrder?: number; published?: boolean;
-  };
+  const values = pickProjectFields(req.body as ProjectBody, "create");
+  if (!values) {
+    res.status(400).json({ error: "Missing required fields" });
+    return;
+  }
   try {
-    const inserted = await db.insert(projectsTable).values({
-      title: body.title,
-      client: body.client,
-      subtitle: body.subtitle,
-      category: body.category ?? "",
-      role: body.role,
-      focus: body.focus,
-      tools: body.tools,
-      coverImage: body.coverImage ?? null,
-      heroImage: body.heroImage ?? null,
-      description: body.description ?? null,
-      outcomes: body.outcomes ?? null,
-      highlightStats: body.highlightStats ?? [],
-      methodologySteps: body.methodologySteps ?? [],
-      galleryImages: body.galleryImages ?? [],
-      plans: body.plans ?? [],
-      sortOrder: body.sortOrder ?? 0,
-      published: body.published ?? false,
-    }).returning();
+    const inserted = await db.insert(projectsTable).values(values).returning();
     res.status(201).json(mapProject(inserted[0]!));
   } catch (err) {
     req.log.error({ err }, "Error creating project");
@@ -123,20 +162,25 @@ router.post("/projects", requireAdmin, async (req: Request, res: Response) => {
 
 router.put("/projects/:id", requireAdmin, async (req: Request, res: Response) => {
   const id = parseInt(req.params.id ?? "");
-  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
-  const body = req.body as Partial<{
-    title: string; client: string; subtitle: string; category: string; role: string; focus: string; tools: string;
-    coverImage: string | null; heroImage: string | null; description: string | null;
-    outcomes: string | null;
-    highlightStats: { label: string; value: string }[];
-    methodologySteps: { title: string; description: string }[];
-    galleryImages: string[];
-    plans: { title: string; url: string }[];
-    sortOrder: number; published: boolean;
-  }>;
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
+  const updateData = pickProjectFields(req.body as ProjectBody, "update");
+  if (!updateData || Object.keys(updateData).length === 0) {
+    res.status(400).json({ error: "No valid fields to update" });
+    return;
+  }
   try {
-    const updated = await db.update(projectsTable).set(body).where(eq(projectsTable.id, id)).returning();
-    if (!updated[0]) { res.status(404).json({ error: "Not found" }); return; }
+    const updated = await db
+      .update(projectsTable)
+      .set(updateData)
+      .where(eq(projectsTable.id, id))
+      .returning();
+    if (!updated[0]) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
     res.json(mapProject(updated[0]));
   } catch (err) {
     req.log.error({ err }, "Error updating project");
@@ -146,7 +190,10 @@ router.put("/projects/:id", requireAdmin, async (req: Request, res: Response) =>
 
 router.delete("/projects/:id", requireAdmin, async (req: Request, res: Response) => {
   const id = parseInt(req.params.id ?? "");
-  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
   try {
     await db.delete(projectsTable).where(eq(projectsTable.id, id));
     res.status(204).send();

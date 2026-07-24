@@ -9,7 +9,7 @@ This guide walks you through deploying the entire portfolio for **free** using:
 | Backend (API server) | **Render** | 750 hrs/month free (sleeps when idle) |
 | Frontend (website) | **Vercel** | Generous free tier |
 
-> **Note on file uploads:** the current code uses Replit Object Storage for project images & PDFs. Those calls will fail outside Replit. Existing images you've uploaded will still be served from Replit. To re-enable new uploads after migrating, you'll need to swap to a free service like Cloudinary or Supabase Storage — not covered in this guide. Everything else (text content, projects, posts, settings, login) works fully.
+> **Note on file uploads:** images and PDFs upload to **Cloudinary** (free tier). Set the three `CLOUDINARY_*` env vars on Render (Step 3). After cutover, re-upload any old Replit-hosted images in admin — legacy `/api/storage/public-objects/*` URLs return 410.
 
 ---
 
@@ -63,8 +63,12 @@ If you want to keep your current projects/posts/settings:
    |---|---|
    | `DATABASE_URL` | Your Neon connection string from Step 2 |
    | `SESSION_SECRET` | Any long random string (e.g. mash your keyboard) |
-   | `ADMIN_PASSWORD` | Bootstrap password used only when no admin hash exists yet |
-   | `CORS_ORIGIN` | Your Vercel URL (e.g. `https://uyen-portfolio.vercel.app`) |
+   | `ADMIN_PASSWORD` | Bootstrap password (12+ chars recommended); only used when no hash exists yet |
+   | `CORS_ORIGIN` | Your Vercel URL (required in production), e.g. `https://uyen-portfolio.vercel.app` |
+   | `CLOUDINARY_CLOUD_NAME` | From Cloudinary dashboard → API Keys |
+   | `CLOUDINARY_API_KEY` | From Cloudinary dashboard → API Keys |
+   | `CLOUDINARY_API_SECRET` | From Cloudinary dashboard → API Keys |
+   | `CLOUDINARY_FOLDER` | Optional; defaults to `utarch` |
    | `NODE_ENV` | `production` |
    | `PORT` | `8080` |
 6. Click **Create Web Service**. First build takes ~5 minutes.
@@ -95,7 +99,7 @@ After the API is live, you need to create the tables. The easiest way:
    | `VITE_API_URL` | The Render URL from Step 3 (e.g. `https://uyen-portfolio-api.onrender.com`) |
 5. Click **Deploy**. Takes ~3 minutes.
 
-> ⚠️ **One small code edit needed:** the frontend currently assumes the API is on the same domain. To make it talk to your Render backend, see Step 5.
+> Set `VITE_API_URL` on Vercel and `CORS_ORIGIN` on Render (Step 5).
 
 ---
 
@@ -133,26 +137,25 @@ Commit & push — both Vercel and Render will auto-redeploy.
 - **Render free tier sleeps after 15 min of inactivity.** First request after sleep takes ~30 seconds to wake. Pay $7/mo to keep it always-on, or upgrade later.
 - **Neon free tier auto-pauses** after 5 min idle but wakes in <1 second.
 - **Custom domain:** both Vercel and Render let you add a custom domain for free. Buy one from Namecheap/Porkbun (~$10/year) and follow their setup.
-- **File uploads:** to make these work after migration, swap `artifacts/api-server/src/routes/uploads.ts` to use Cloudinary's free SDK. Ask any AI assistant to help with that change when you're ready.
+- **File uploads:** create a free Cloudinary account, paste the three API keys into Render, then upload/re-upload images in `/admin`. Stored URLs are absolute CDN links (work with Vercel + Render split).
 - **Updates:** any time you change code, just `git push` — Vercel + Render auto-redeploy.
 
 ---
 
-## What's in this archive
+## What's in this repo
 
 ```
 artifacts/
-  portfolio/        ← The website (React + Vite)
+  portfolio/        ← Website (React + Vite)
   api-server/       ← Backend Express API
-  mockup-sandbox/   ← Dev-only, can be deleted for production
 lib/
   db/               ← Database schema (Drizzle ORM)
   api-spec/         ← OpenAPI spec
   api-client-react/ ← Generated React Query hooks
   api-zod/          ← Generated validation schemas
-portfolio_backup.sql  ← Your current database content (Apr 2026 snapshot)
+portfolio_backup.sql  ← Database content snapshot (optional Neon import)
 DEPLOYMENT.md         ← This guide
 README.md             ← Project overview
 ```
 
-Good luck! If anything breaks, the error messages from Render/Vercel logs are usually clear about what's wrong.
+Good luck. If anything breaks, Render/Vercel logs usually point to the missing env var or build step.

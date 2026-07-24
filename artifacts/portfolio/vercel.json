@@ -1,4 +1,8 @@
 {
+  "buildCommand": "cd ../.. && pnpm install && pnpm --filter @workspace/portfolio build",
+  "outputDirectory": "dist/public",
+  "installCommand": "",
+  "framework": "vite",
   "rewrites": [
     {
       "source": "/(.*)",

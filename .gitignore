@@ -53,7 +53,18 @@ Thumbs.db
 .env.*
 !.env.example
 
+# Secrets / credentials (never commit)
+*.pem
+*.p12
+*.pfx
+credentials.json
+**/secrets.json
+service-account*.json
+
 # Archives / full project dumps (keep portfolio_backup.sql for Neon import)
 *.tar.gz
 uyen-portfolio.tar.gz
 portfolio_backup.tar.gz
+
+.vercel
+.env*

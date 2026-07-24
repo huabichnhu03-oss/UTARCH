@@ -249,9 +249,12 @@ COPY public.projects (id, title, client, subtitle, role, focus, tools, cover_ima
 --
 -- Data for Name: site_settings; Type: TABLE DATA; Schema: public; Owner: -
 --
+-- NOTE: admin_password_hash intentionally omitted (\N). After import, set ADMIN_PASSWORD
+-- in your environment (or change password in Admin → Settings) so a new hash is created.
+--
 
 COPY public.site_settings (id, owner_name, title, subtitle, hero_image, about_heading, about_body, info_items, location, email, phone, linkedin, archive_date_range, admin_password_hash, primary_color, accent_color) FROM stdin;
-1	Uyen Ton	Architectural Technologist	Sheridan College High Honours graduate specializing in technical drawing, 3D modeling, and strict Ontario Building Code compliance.	https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80	Translating complex architectural concepts into highly precise construction documents.	My process prioritizes seamless workflows—from initial site measurements to detailed CAD drafting—ensuring full compliance with zoning by-laws and sustainable LEED standards. I bring spaces to life through accurate technical specifications and immersive 3D visualizations.	["BASED IN TORONTO, ON", "AVAILABLE FOR HIRE", "OBC & LEED COMPLIANT"]	Toronto, Ontario	uyenton285@gmail.com	647-713-4229	https://www.linkedin.com/in/uyentonarch/	2019 — Present	$2b$10$alMDQBf6QUD049zqJcwuI.hmopUmguKbZPZhlECZbtF6Kecls42qW	#0033A0	#FF4A22
+1	Uyen Ton	Architectural Technologist	Sheridan College High Honours graduate specializing in technical drawing, 3D modeling, and strict Ontario Building Code compliance.	https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80	Translating complex architectural concepts into highly precise construction documents.	My process prioritizes seamless workflows—from initial site measurements to detailed CAD drafting—ensuring full compliance with zoning by-laws and sustainable LEED standards. I bring spaces to life through accurate technical specifications and immersive 3D visualizations.	["BASED IN TORONTO, ON", "AVAILABLE FOR HIRE", "OBC & LEED COMPLIANT"]	Toronto, Ontario	uyenton285@gmail.com	647-713-4229	https://www.linkedin.com/in/uyentonarch/	2019 — Present	\N	#0033A0	#FF4A22
 \.
 
 

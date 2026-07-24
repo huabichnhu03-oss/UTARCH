@@ -1,57 +1,60 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import multer from "multer";
-import { objectStorageClient } from "../lib/objectStorage";
+import { requireAdmin } from "../middlewares/requireAdmin";
+import { isCloudinaryConfigured, uploadBuffer } from "../lib/cloudinary";
 
 const router: IRouter = Router();
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 
-function requireAdmin(req: Request, res: Response, next: () => void) {
-  const isAdmin = (req.session as unknown as Record<string, unknown>)["isAdmin"] === true;
-  if (!isAdmin) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
-  next();
-}
+const ALLOWED_MIME = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "application/pdf",
+]);
 
-function getPublicStoragePath(): { bucketName: string; prefix: string } {
-  const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
-  const firstPath = pathsStr.split(",")[0]?.trim();
-  if (!firstPath) throw new Error("PUBLIC_OBJECT_SEARCH_PATHS not configured");
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter(_req, file, cb) {
+    if (ALLOWED_MIME.has(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only JPEG, PNG, WebP, GIF, and PDF files are allowed"));
+    }
+  },
+});
 
-  const parts = firstPath.startsWith("/") ? firstPath.slice(1).split("/") : firstPath.split("/");
-  const bucketName = parts[0];
-  const prefix = parts.slice(1).join("/");
-  return { bucketName, prefix };
-}
-
-router.post("/uploads", requireAdmin, upload.single("file"), async (req: Request, res: Response) => {
-  if (!req.file) {
-    res.status(400).json({ error: "No file provided" });
-    return;
-  }
-
-  try {
-    const { originalname, mimetype, buffer } = req.file;
-    const ext = originalname.split(".").pop() ?? "bin";
-    const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-
-    const { bucketName, prefix } = getPublicStoragePath();
-    const objectName = prefix ? `${prefix}/${filename}` : filename;
-
-    const bucket = objectStorageClient.bucket(bucketName);
-    const file = bucket.file(objectName);
-
-    await file.save(buffer, {
-      metadata: { contentType: mimetype },
+router.post("/uploads", requireAdmin, (req: Request, res: Response) => {
+  if (!isCloudinaryConfigured()) {
+    res.status(503).json({
+      error:
+        "File uploads are not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.",
     });
-
-    const url = `/api/storage/public-objects/${filename}`;
-    res.json({ url, key: objectName });
-  } catch (err) {
-    req.log.error({ err }, "Error uploading file");
-    res.status(500).json({ error: "Upload failed" });
+    return;
   }
+
+  upload.single("file")(req, res, async (err: unknown) => {
+    if (err) {
+      const message = err instanceof Error ? err.message : "Upload failed";
+      res.status(400).json({ error: message });
+      return;
+    }
+
+    if (!req.file) {
+      res.status(400).json({ error: "No file provided" });
+      return;
+    }
+
+    try {
+      const { mimetype, buffer } = req.file;
+      const result = await uploadBuffer(buffer, { mimetype });
+      res.json({ url: result.url, key: result.publicId });
+    } catch (uploadErr) {
+      req.log.error({ err: uploadErr }, "Error uploading file");
+      res.status(500).json({ error: "Upload failed" });
+    }
+  });
 });
 
 export default router;

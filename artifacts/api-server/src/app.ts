@@ -2,26 +2,42 @@ import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { pool } from "@workspace/db";
 
 const app: Express = express();
 
 app.set("trust proxy", 1);
 
 const isProduction = process.env.NODE_ENV === "production";
-const sessionSecret = process.env.SESSION_SECRET;
-if (isProduction && (!sessionSecret || sessionSecret === "portfolio-secret-key")) {
-  throw new Error("SESSION_SECRET must be set to a strong random value in production");
+const sessionSecret = process.env.SESSION_SECRET?.trim();
+const weakSessionSecrets = new Set([
+  "",
+  "portfolio-secret-key",
+  "change-me-to-a-long-random-string",
+]);
+if (!sessionSecret || weakSessionSecrets.has(sessionSecret)) {
+  throw new Error(
+    "SESSION_SECRET must be set to a strong random value (see .env.example). Never commit real secrets.",
+  );
 }
 
 // Comma-separated allowlist for split frontend/backend deploys (e.g. Vercel + Render).
-// Falls back to reflecting the request Origin when unset (Replit / same-origin).
 const corsOrigins = (process.env.CORS_ORIGIN || "")
   .split(",")
   .map((o) => o.trim())
   .filter(Boolean);
+
+if (isProduction && corsOrigins.length === 0) {
+  throw new Error(
+    "CORS_ORIGIN must be set in production (e.g. https://your-app.vercel.app)",
+  );
+}
+
 const crossOrigin = corsOrigins.length > 0;
+const PgSession = connectPgSimple(session);
 
 app.use(
   pinoHttp({
@@ -42,10 +58,12 @@ app.use(
     },
   }),
 );
+
 app.use(
   cors({
     origin: crossOrigin
       ? (origin, callback) => {
+          // Allow non-browser tools (no Origin) and allowlisted frontends
           if (!origin || corsOrigins.includes(origin)) {
             callback(null, true);
           } else {
@@ -56,20 +74,27 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true }));
+
+// JSON payloads are small; file uploads use multer separately
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 app.use(
   session({
-    secret: sessionSecret || "portfolio-secret-key",
+    store: new PgSession({
+      pool,
+      createTableIfMissing: true,
+      tableName: "session",
+    }),
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
       secure: isProduction,
       httpOnly: true,
-      // Cross-site cookies require SameSite=None + Secure (Vercel frontend → Render API)
+      // Cross-site cookies require SameSite=None + Secure (Vercel → Render)
       sameSite: crossOrigin ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     },
   }),
 );

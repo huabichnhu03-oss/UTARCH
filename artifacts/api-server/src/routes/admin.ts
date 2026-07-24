@@ -2,12 +2,13 @@ import { Router, type IRouter, type Request, type Response } from "express";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { db, siteSettingsTable } from "@workspace/db";
+import { loginRateLimiter } from "../middlewares/loginRateLimit";
 
 const router: IRouter = Router();
 
-router.post("/admin/login", async (req: Request, res: Response) => {
-  const { password } = req.body as { password: string };
-  if (!password) {
+router.post("/admin/login", loginRateLimiter, async (req: Request, res: Response) => {
+  const { password } = req.body as { password?: string };
+  if (!password || typeof password !== "string") {
     res.status(400).json({ error: "Password required" });
     return;
   }
@@ -21,7 +22,7 @@ router.post("/admin/login", async (req: Request, res: Response) => {
 
     if (row?.adminPasswordHash) {
       // Prefer the stored hash so Settings password changes stick.
-      // ADMIN_PASSWORD is only a bootstrap when no hash exists yet.
+      // ADMIN_PASSWORD only bootstraps when no hash exists yet.
       match = await bcrypt.compare(password, row.adminPasswordHash);
     } else if (envPassword && password === envPassword) {
       match = true;
@@ -37,7 +38,9 @@ router.post("/admin/login", async (req: Request, res: Response) => {
     }
 
     if (!match) {
-      res.status(401).json({ error: row?.adminPasswordHash ? "Invalid password" : "Admin not configured" });
+      res.status(401).json({
+        error: row?.adminPasswordHash ? "Invalid password" : "Admin not configured",
+      });
       return;
     }
 
